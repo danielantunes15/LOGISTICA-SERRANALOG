@@ -110,7 +110,6 @@ export class CadastrosView {
                 { name: 'longitude', label: 'Longitude', type: 'text', required: false }
             ],
             caminhoes: [
-                // SEPARADO O CÓDIGO DA PLACA
                 { name: 'cod_equipamento', label: 'Código (Ex: CAM-01)', type: 'text', required: true },
                 { name: 'placa', label: 'Placa (Ex: ABC-1234)', type: 'text', required: true },
                 { name: 'descricao', label: 'Descrição/Modelo', type: 'text', required: true },
@@ -149,10 +148,10 @@ export class CadastrosView {
                 { name: 'telefone', label: 'Telefone', type: 'text', required: false, validation: 'phone' } 
             ],
             terceiros: [
-                { name: 'nome', label: 'Nome do Colaborador', type: 'text', required: true },
-                { name: 'cpf_cnpj', label: 'CPF/CNPJ', type: 'text', required: true, validation: 'cpfcnpj' }, 
+                { name: 'nome', label: 'Nome do Motorista / Colaborador', type: 'text', required: true },
+                { name: 'cpf_cnpj', label: 'CPF', type: 'text', required: true, validation: 'cpfcnpj' }, 
                 { name: 'descricao_atividade', label: 'Cargo / Atividade', type: 'select', options: ['Motorista canavieiro', 'Operador de trator reboque', 'Operador de carregadeira', 'Operador de trator transbordo', 'Operador de colhedora', 'Fiscal de equipe', 'Motorista pipa'], required: true },
-                { name: 'empresa_id', label: 'Empresa Parceira', type: 'select', source: 'proprietarios', displayField: 'nome', required: true },
+                { name: 'empresa_id', label: 'Empresa / Vínculo', type: 'select', source: 'proprietarios', displayField: 'nome', required: true },
                 { name: 'situacao', label: 'Situação Operacional', type: 'select', options: ['ativo', 'inativo', 'excluído pelo parceiro'], required: true },
                 { name: 'status_homologacao', label: 'Status de Integração', type: 'select', options: ['Integrado (Apto)', 'Falta Integração', 'Bloqueado'], required: true },
                 { name: 'documento', label: 'Upload de CNH/Certificado (Opcional)', type: 'file', required: false }
@@ -165,7 +164,7 @@ export class CadastrosView {
         const names = {
             'fazendas': 'Fazendas', 'caminhoes': 'Caminhões', 'equipamentos': 'Equipamentos',
             'frentes_servico': 'Frentes de Serviço', 'fornecedores': 'Fornecedores',
-            'proprietarios': 'Proprietários (Empresas)', 'terceiros': 'Terceiros (Funcionários)'
+            'proprietarios': 'Proprietários (Empresas)', 'terceiros': 'Motoristas e Colaboradores'
         };
         return names[this.tipo] || this.tipo;
     }
@@ -241,7 +240,7 @@ export class CadastrosView {
             return inputHTML;
         }).join('');
     
-        const submitText = isEdit ? 'Salvar Alterações' : `Cadastrar ${this.getTipoDisplayName().slice(0, -1)}`;
+        const submitText = isEdit ? 'Salvar Alterações' : `Cadastrar ${this.getTipoDisplayName().split(' ')[0]}`;
         return `<form id="${isEdit ? 'form-edit-' + this.tipo : 'form-' + this.tipo}" class="form-modern" enctype="multipart/form-data">${inputsHTML}<button type="submit" class="form-submit"><i class="ph-fill ph-floppy-disk"></i> ${submitText}</button></form>`;
     }
 
@@ -307,7 +306,7 @@ export class CadastrosView {
 
         const items = this.data[this.tipo] || [];
         if (items.length === 0) {
-            tableContainer.innerHTML = `<div class="empty-state"><i class="ph-fill ph-table"></i><p>Nenhum ${this.getTipoDisplayName().toLowerCase()} cadastrado</p></div>`;
+            tableContainer.innerHTML = `<div class="empty-state"><i class="ph-fill ph-table"></i><p>Nenhum registro encontrado.</p></div>`;
             return;
         }
 
@@ -319,13 +318,12 @@ export class CadastrosView {
     getTableHeaders() {
         const headersConfig = {
             'fazendas': ['Código', 'Nome', 'Fornecedor', 'Coordenadas', 'Ações'],
-            // ADICIONADO COLUNA PLACA AQUI PARA CAMINHÕES
             'caminhoes': ['Código', 'Placa', 'Modelo', 'Empresa', 'Situação', 'Homologação', 'Ações'],
             'equipamentos': ['Código', 'Modelo', 'Empresa', 'Situação', 'Homologação', 'Ações'],
             'frentes_servico': ['Código', 'Nome', 'Grupo de Produção', 'Ações'],
             'fornecedores': ['Código', 'Nome', 'CPF/CNPJ', 'Telefone', 'Ações'],
             'proprietarios': ['Código', 'Nome', 'CPF/CNPJ', 'Telefone', 'Ações'],
-            'terceiros': ['Nome', 'Atividade', 'Empresa', 'Situação', 'Homologação', 'Ações']
+            'terceiros': ['Nome (Motorista/Colab.)', 'Atividade', 'Empresa', 'Situação', 'Homologação', 'Ações']
         };
         return (headersConfig[this.tipo] || ['Nome', 'Ações']).map(h => `<th>${h}</th>`).join('');
     }
@@ -361,7 +359,6 @@ export class CadastrosView {
 
         const cellsConfig = {
             'fazendas': [item.cod_equipamento, item.nome, item.fornecedores?.nome || 'N/A', item.latitude && item.longitude ? `${parseFloat(item.latitude).toFixed(4)}, ${parseFloat(item.longitude).toFixed(4)}` : 'N/A'],
-            // EXIBE A PLACA NA TABELA DE CAMINHÕES
             'caminhoes': [item.cod_equipamento, item.placa || '-', item.descricao || 'N/A', propNome, renderBadge(item.situacao, 'sit'), renderBadge(item.status_homologacao, 'hom')],
             'equipamentos': [item.cod_equipamento, item.descricao || 'N/A', propNome, renderBadge(item.situacao, 'sit'), renderBadge(item.status_homologacao, 'hom')],
             'frentes_servico': [item.cod_equipamento, item.nome, this.formatOption(item.tipo_producao)], 
@@ -447,7 +444,7 @@ export class CadastrosView {
                 if (!error) closeModal();
             } else {
                 ({ error } = await insertItem(this.tipo, data));
-                handleOperation(error, `${this.getTipoDisplayName().slice(0, -1)} cadastrado!`);
+                handleOperation(error, `${this.getTipoDisplayName().split(' ')[0]} cadastrado(a)!`);
                 if (!error) form.reset();
             }
             
@@ -469,7 +466,7 @@ export class CadastrosView {
         if (this.tipo === 'equipamentos' && item.equipamento_terceiros) item.operadores = item.equipamento_terceiros.map(et => et.terceiro_id);
     
         const formHTML = this.generateFormHTML(item);
-        openModal(`Editar ${this.getTipoDisplayName().slice(0, -1)}`, formHTML);
+        openModal(`Editar ${this.getTipoDisplayName().split(' ')[0]}`, formHTML);
         
         const editForm = document.getElementById(`form-edit-${this.tipo}`);
         this.setupValidationListeners(editForm);
@@ -491,7 +488,7 @@ export class CadastrosView {
                 showToast('Não é possível excluir. Este item está em uso.', 'error');
             } else {
                 dataCache.invalidateAllData();
-                handleOperation(error, `${this.getTipoDisplayName().slice(0, -1)} excluído!`);
+                handleOperation(error, `${this.getTipoDisplayName().split(' ')[0]} excluído(a)!`);
                 if (!error) await this.loadData(true);
             }
         } catch (err) { handleOperation(err); } 

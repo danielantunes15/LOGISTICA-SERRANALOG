@@ -10,17 +10,14 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
     
-    // Contadores com fallback para 0
     const { 
         downtimeCaminhoes = 0, 
         downtimeEquipamentos = 0, 
         descargaCount = 0 
     } = counts;
 
-    // CORREÇÃO AQUI: Agora aceita tanto 'admin' quanto 'superadmin'
     const isAdmin = userRole === 'admin' || userRole === 'superadmin';
 
-    // Menu exclusivo para Parceiros (Apenas Admin/Superadmin)
     const parceirosMenu = isAdmin ? `
         <button class="nav-button" data-view="gerenciamento-terceiros" style="border-left: 3px solid transparent; transition: all 0.2s;">
             <i class="ph-fill ph-handshake" style="color: var(--primary-color);"></i>
@@ -28,7 +25,6 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
         </button>
     ` : '';
 
-    // Menu Gerencial (Apenas Admin/Superadmin)
     const gerencialGroup = isAdmin ? `
         <div class="nav-group" id="gerencial-group">
             <button class="nav-button-group">
@@ -45,7 +41,7 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
         </div>
     ` : '';
     
-    // Conteúdo da seção Cadastros
+    // Conteúdo da seção Cadastros - Ordem atualizada
     const cadastrosGroup = `
         <div class="nav-group" id="cadastros-group">
             <button class="nav-button-group">
@@ -54,13 +50,17 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
                 <i class="ph ph-caret-down caret"></i>
             </button>
             <div class="submenu">
-                <button class="nav-button" data-view="cadastro-fazendas">
-                    <i class="ph-fill ph-tree-evergreen"></i>
-                    <span>Fazendas</span>
-                </button>
                 <button class="nav-button" data-view="cadastro-caminhoes">
                     <i class="ph-fill ph-truck"></i>
                     <span>Caminhões</span>
+                </button>
+                <button class="nav-button" data-view="cadastro-terceiros">
+                    <i class="ph-fill ph-identification-card"></i>
+                    <span>Motoristas (Colaboradores)</span>
+                </button>
+                <button class="nav-button" data-view="cadastro-fazendas">
+                    <i class="ph-fill ph-tree-evergreen"></i>
+                    <span>Fazendas</span>
                 </button>
                 <button class="nav-button" data-view="cadastro-equipamentos">
                     <i class="ph-fill ph-tractor"></i>
@@ -75,18 +75,13 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
                     <span>Fornecedores</span>
                 </button>
                 <button class="nav-button" data-view="cadastro-proprietarios">
-                    <i class="ph-fill ph-user-circle"></i>
-                    <span>Proprietários</span>
-                </button>
-                <button class="nav-button" data-view="cadastro-terceiros">
-                    <i class="ph-fill ph-user"></i>
-                    <span>Terceiros</span>
+                    <i class="ph-fill ph-buildings"></i>
+                    <span>Empresas (Proprietários)</span>
                 </button>
             </div>
         </div>
     `;
 
-    // Novo Menu Completo de Frota Própria (Tritrens)
     const frotaGroup = `
         <div class="nav-group" id="frota-group">
             <button class="nav-button-group">
@@ -124,7 +119,6 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
         </div>
     `;
     
-    // Bloco de Perfil minimalista no final
     const profileFooterBlock = `
         <div class="profile-menu-container">
             <button class="nav-button-group nav-profile-button" id="btn-profile-menu-toggle">
@@ -218,7 +212,6 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
 }
 
 function addSidebarEventListeners() {
-    // Listener para os botões de navegação
     document.querySelectorAll('.nav-button').forEach(button => {
         button.addEventListener('click', (e) => {
             if (e.target.closest('.nav-button-group')) return;
@@ -230,7 +223,6 @@ function addSidebarEventListeners() {
         });
     });
 
-    // Toggle para o submenu Cadastros
     const cadastrosGroup = document.getElementById('cadastros-group');
     if (cadastrosGroup) {
         const navButtonGroup = cadastrosGroup.querySelector('.nav-button-group');
@@ -241,7 +233,6 @@ function addSidebarEventListeners() {
         }
     }
 
-    // Toggle para o submenu Gerencial
     const gerencialGroupEl = document.getElementById('gerencial-group');
     if (gerencialGroupEl) {
         const navButtonGroupGerencial = gerencialGroupEl.querySelector('.nav-button-group');
@@ -252,7 +243,6 @@ function addSidebarEventListeners() {
         }
     }
 
-    // Toggle para o submenu Frota Própria
     const frotaGroupEl = document.getElementById('frota-group');
     if (frotaGroupEl) {
         const navButtonGroupFrota = frotaGroupEl.querySelector('.nav-button-group');
@@ -263,7 +253,6 @@ function addSidebarEventListeners() {
         }
     }
     
-    // Toggle para o submenu Meu Perfil
     const profileMenuContainer = document.querySelector('.profile-menu-container');
     const profileMenuToggle = document.getElementById('btn-profile-menu-toggle');
     const profileSubmenu = document.getElementById('profile-submenu');
@@ -274,7 +263,6 @@ function addSidebarEventListeners() {
         });
     }
     
-    // Ações dentro do submenu de perfil
     if (profileSubmenu) {
         profileSubmenu.addEventListener('click', (e) => {
             const actionButton = e.target.closest('.nav-button');
