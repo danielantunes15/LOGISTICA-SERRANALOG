@@ -26,12 +26,10 @@ export class GerencialView {
         this.escalaData = {}; 
         this.scheduleChanged = false;
         
-        // NOVO: Adicionado 'Controlador de Tráfego' na lista de funções
+        // MUDANÇA: 'Balanceiro' e 'Auxiliar de Serviços Gerais' removidos.
         this.funcoes = [
             'Líder de Produção Agrícola',
-            'Balanceiro',
-            'Motorista de Pipa',
-            'Auxiliar de Serviços Gerais',
+            'Motorista',
             'Controlador de Tráfego'
         ];
         
@@ -243,7 +241,6 @@ export class GerencialView {
         return schedule;
     }
 
-    // NOVO: Escala 12x36 (Dia ou Noite fixo - 1 dia sim, 1 dia não)
     generate12x36Schedule(funcionarioId, startDateStr, turnoName) {
         const schedule = [];
         const [year, month, day] = startDateStr.split('-').map(Number);
@@ -254,7 +251,6 @@ export class GerencialView {
             currentDate.setUTCDate(currentDate.getUTCDate() + i);
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
-            // Pula 1 dia (se i for par, trabalha. Se ímpar, folga)
             schedule.push({
                 funcionario_id: funcionarioId,
                 data: currentDateStr,
@@ -264,7 +260,6 @@ export class GerencialView {
         return schedule;
     }
 
-    // NOVO: Escala Viradinha (2 Dia, 2 Noite, 2 Folga)
     generateViradinhaSchedule(funcionarioId, startDateStr) {
         const schedule = [];
         const [year, month, day] = startDateStr.split('-').map(Number);
@@ -275,7 +270,7 @@ export class GerencialView {
             currentDate.setUTCDate(currentDate.getUTCDate() + i);
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
-            const mod = i % 6; // Ciclo de 6 dias
+            const mod = i % 6;
             let turno = 'Folga';
             if (mod === 0 || mod === 1) turno = 'Dia';
             else if (mod === 2 || mod === 3) turno = 'Noite';
@@ -289,7 +284,6 @@ export class GerencialView {
         return schedule;
     }
 
-    // NOVO: Escala ADM (Segunda a Sexta)
     generateADMSchedule(funcionarioId, startDateStr) {
         const schedule = [];
         const [year, month, day] = startDateStr.split('-').map(Number);
@@ -300,7 +294,7 @@ export class GerencialView {
             currentDate.setUTCDate(currentDate.getUTCDate() + i);
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
-            const dayOfWeek = currentDate.getUTCDay(); // 0 = Domingo, 6 = Sábado
+            const dayOfWeek = currentDate.getUTCDay();
             const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
 
             schedule.push({
@@ -418,7 +412,6 @@ export class GerencialView {
                         const dateStr = date.toISOString().split('T')[0];
                         const turno = this.escalaData[func.id]?.[dateStr] || 'Folga';
                         const selectId = `turno-${func.id}-${dateStr}`;
-                        // NOVO: Adicionado opções Dia, Noite e ADM
                         return `
                             <td>
                                 <select class="turno-select turno-${turno}" id="${selectId}" data-funcionario-id="${func.id}" data-date="${dateStr}">
@@ -515,7 +508,6 @@ export class GerencialView {
             </tr>
         `).join('');
         
-        // NOVO: Adicionado seletor de Tipo de Escala e ID ao grupo do turno inicial
         const modalContent = `
             <div class="gerenciar-funcionarios-modal">
                 <form id="form-add-funcionario" class="form-modern" style="margin-bottom: 24px;">
@@ -532,7 +524,7 @@ export class GerencialView {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="tipo-escala">Tipo de Escala (Novo)</label>
+                        <label for="tipo-escala">Tipo de Escala</label>
                         <select id="tipo-escala" class="form-select" required>
                             <option value="">Selecione...</option>
                             <option value="6x2_rotativo">6x2 Rotativo (Turnos A, B, C)</option>
@@ -578,13 +570,11 @@ export class GerencialView {
         `;
         openModal('Gerenciar Funcionários da Escala', modalContent);
 
-        // Esconde/Exige o "Turno Inicial" de acordo com o tipo de escala escolhido
         document.getElementById('tipo-escala').addEventListener('change', (e) => {
             const val = e.target.value;
             const turnoInicialGroup = document.getElementById('turno-inicial-group');
             const turnoInicialInput = document.getElementById('turno-inicial');
             
-            // Se for as novas escalas (12h, adm, etc), o turno inicial A/B/C não faz sentido
             if (['12x36_dia', '12x36_noite', 'viradinha', 'adm'].includes(val)) {
                 turnoInicialGroup.style.display = 'none';
                 turnoInicialInput.removeAttribute('required');
@@ -610,7 +600,6 @@ export class GerencialView {
                 let escalaGerada;
                 let successMessage;
 
-                // NOVO: Geração dinâmica de escala baseada na seleção do usuário
                 switch(tipoEscala) {
                     case '12x36_dia':
                         escalaGerada = this.generate12x36Schedule(novoFuncionario.id, dataInicio, 'Dia');
@@ -727,7 +716,6 @@ export class GerencialView {
         });
     }
 
-    // --- MÉTODOS DA ABA DE USUÁRIOS (MANTIDOS INTACTOS) ---
     async loadUserData() {
         try {
             this.users = await fetchAppUsers();
@@ -972,7 +960,6 @@ export class GerencialView {
         }
     }
     
-    // --- MÉTODOS DA ABA DE METAS (MANTIDOS INTACTOS) ---
     async loadMetasData() {
         try {
             const masterData = await dataCache.fetchMasterDataOnly(true); 
