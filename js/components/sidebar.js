@@ -186,6 +186,11 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
                 <span>Ocorrências</span>
             </button>
 
+            <button class="nav-button" data-view="escalas"> 
+                <i class="ph-fill ph-calendar"></i>
+                <span>Escalas</span>
+            </button>
+
             <button class="nav-button" data-view="tempo"> 
                 <i class="ph-fill ph-cloud-sun"></i>
                 <span>Tempo</span>

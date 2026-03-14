@@ -1,0 +1,37 @@
+<div id="escalas-view" class="view" style="display: none;">
+    <div class="controle-header">
+        <h1>Gestão de Escalas</h1>
+        <div class="controle-actions">
+            <button class="btn-primary" id="btn-nova-escala">
+                <i class="ph-fill ph-plus"></i>
+                Nova Escala
+            </button>
+            <button class="btn-secondary" id="refresh-escalas">
+                <i class="ph-fill ph-arrows-clockwise"></i>
+                Atualizar
+            </button>
+        </div>
+    </div>
+
+    <div class="controle-grid">
+        <div class="controle-card" style="grid-column: 1 / -1;">
+            <h3>Escalas Programadas</h3>
+            <div class="list-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Motorista/Operador</th>
+                            <th>Veículo/Equipamento</th>
+                            <th>Frente/Turno</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-escalas-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

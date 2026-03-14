@@ -15,6 +15,8 @@ import { PatioCarregadoView } from './patioCarregado.js';
 import { GerenciamentoTerceirosView } from './gerenciamentoTerceiros.js';
 // NOVO: Importando o gerenciador dos novos módulos de Frota
 import { GestaoFrotaView } from './gestaoFrota.js';
+// NOVO: Importando a view dedicada de Escalas
+import { EscalasView } from './escalas.js';
 
 export class ViewManager {
     constructor(appManager) { 
@@ -47,6 +49,7 @@ export class ViewManager {
         this.views.set('gerenciamento-terceiros', new GerenciamentoTerceirosView());
         
         this.views.set('ocorrencias', new OcorrenciasView());
+        this.views.set('escalas', new EscalasView());
         this.views.set('tempo', new TempoView());
 
         this.views.set('cadastro-fazendas', new CadastrosView('fazendas'));
