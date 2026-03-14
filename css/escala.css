@@ -179,3 +179,43 @@
 .turno-select.turno-A { background-color: #38A169; color: white; }
 .turno-select.turno-B { background-color: #2B6CB0; color: white; }
 .turno-select.turno-C { background-color: #805AD5; color: white; }
+
+/* Estilização das Células da Escala */
+.escala-table td.td-turno {
+    transition: all 0.3s ease;
+    padding: 8px !important;
+}
+
+/* DIAS DE TRABALHO: Cores de fundo suaves e profissionais */
+.td-turno.turno-Dia, .td-turno.turno-A { 
+    background-color: #fff9db !important; /* Amarelo muito claro */
+}
+
+.td-turno.turno-Noite, .td-turno.turno-C { 
+    background-color: #e7f5ff !important; /* Azul muito claro */
+}
+
+.td-turno.turno-B, .td-turno.turno-ADM { 
+    background-color: #f3f0ff !important; /* Roxo muito claro */
+}
+
+/* DIA DE FOLGA: Destaque para facilitar a leitura rápida */
+.td-turno.turno-Folga {
+    background-color: #fff5f5 !important; /* Vermelho/Rosa clarinho para a célula */
+}
+
+/* Estilo do Select dentro da célula colorida */
+.turno-select {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    padding: 4px;
+    width: 100%;
+    font-weight: 500;
+}
+
+/* Destaque visual na borda para a Folga */
+.turno-select.turno-Folga {
+    border-color: #ffc9c9;
+    color: #fa5252;
+    background-color: white;
+}
