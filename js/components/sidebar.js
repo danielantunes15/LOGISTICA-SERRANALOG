@@ -1,4 +1,5 @@
 // js/components/sidebar.js
+import { getLocalSession } from '../api.js';
 
 /**
  * Carrega a barra lateral e os itens de navegação.
@@ -9,35 +10,148 @@
 export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts = {}) { 
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
+
+    // Busca a sessão local do usuário para ler os menus que ele tem acesso
+    const session = await getLocalSession();
+    const menusPermitidos = session?.menus_permitidos || [];
+
+    // Função para verificar se renderiza o botão (se o menu está na lista de permitidos)
+    const hasMenu = (menuId) => {
+        // Se o banco retornar null/vazio por ser um admin antigo, garantimos acesso a tudo
+        if (menusPermitidos.length === 0 && (userRole === 'admin' || userRole === 'superadmin')) return true;
+        return menusPermitidos.includes(menuId);
+    };
     
     // Contadores com fallback para 0
     const { 
         downtimeCaminhoes = 0, 
-        downtimeEquipamentos = 0, 
-        descargaCount = 0 
+        downtimeEquipamentos = 0
     } = counts;
 
-    // Aceita tanto 'admin' quanto 'superadmin'
-    const isAdmin = userRole === 'admin' || userRole === 'superadmin';
+    // Renderização Condicional dos Menus
+    const dashboardBtn = hasMenu('dashboard') ? `
+        <button class="nav-button active" data-view="dashboard">
+            <i class="ph-fill ph-map-trifold"></i>
+            <span>Mapa Principal</span>
+        </button>
+    ` : '';
 
-    // Menu exclusivo para Parceiros (Apenas Admin/Superadmin)
-    const parceirosMenu = isAdmin ? `
+    const boletimBtn = hasMenu('boletim-diario') ? `
+        <button class="nav-button" data-view="boletim-diario">
+            <i class="ph-fill ph-newspaper"></i>
+            <span>Boletim Diário</span>
+        </button>
+    ` : '';
+
+    const controleBtn = hasMenu('controle') ? `
+        <button class="nav-button" data-view="controle">
+            <i class="ph-fill ph-arrows-clockwise"></i>
+            <span>Painel de Controle</span>
+        </button>
+    ` : '';
+
+    const frotaGroup = hasMenu('frota') ? `
+        <div class="nav-group" id="frota-group">
+            <button class="nav-button-group">
+                <i class="ph-fill ph-truck"></i>
+                <span>Frota Própria</span>
+                ${downtimeCaminhoes > 0 ? `<span class="badge alert" style="margin-left:auto; margin-right:10px;">${downtimeCaminhoes}</span>` : ''}
+                <i class="ph ph-caret-down caret"></i>
+            </button>
+            <div class="submenu">
+                <button class="nav-button" data-view="frota-dashboard">
+                    <i class="ph-fill ph-chart-pie-slice"></i>
+                    <span>Dashboard Frota</span>
+                </button>
+                <button class="nav-button" data-view="frota-abastecimento">
+                    <i class="ph-fill ph-gas-pump"></i>
+                    <span>Combustível e Médias</span>
+                </button>
+                <button class="nav-button" data-view="frota-pneus">
+                    <i class="ph-fill ph-circles-four"></i>
+                    <span>Gestão de Pneus</span>
+                </button>
+                <button class="nav-button" data-view="frota-manutencao">
+                    <i class="ph-fill ph-wrench"></i>
+                    <span>Manutenção (OS)</span>
+                </button>
+                <button class="nav-button" data-view="frota-telemetria">
+                    <i class="ph-fill ph-steering-wheel"></i>
+                    <span>Telemetria</span>
+                </button>
+                <button class="nav-button" data-view="frota-motoristas">
+                    <i class="ph-fill ph-identification-card"></i>
+                    <span>Motoristas</span>
+                </button>
+            </div>
+        </div>
+    ` : '';
+
+    const equipamentosBtn = hasMenu('equipamentos') ? `
+        <button class="nav-button" data-view="equipamentos">
+            <i class="ph-fill ph-tractor"></i>
+            <span>Equipamentos</span>
+            ${downtimeEquipamentos > 0 ? `<span class="badge alert">${downtimeEquipamentos}</span>` : ''}
+        </button>
+    ` : '';
+
+    const patioBtn = hasMenu('fila-patio-carregado') ? `
+        <button class="nav-button" data-view="fila-patio-carregado"> 
+            <i class="ph-fill ph-warehouse"></i>
+            <span>Pátio Carregado</span>
+        </button>
+    ` : '';
+
+    const fazendasBtn = hasMenu('fazendas') ? `
+        <button class="nav-button" data-view="fazendas"> 
+            <i class="ph-fill ph-tree-evergreen"></i>
+            <span>Fazendas</span>
+        </button>
+    ` : '';
+
+    const ocorrenciasBtn = hasMenu('ocorrencias') ? `
+        <button class="nav-button" data-view="ocorrencias"> 
+            <i class="ph-fill ph-siren"></i>
+            <span>Ocorrências</span>
+        </button>
+    ` : '';
+
+    const escalasBtn = hasMenu('escalas') ? `
+        <button class="nav-button" data-view="escalas"> 
+            <i class="ph-fill ph-calendar"></i>
+            <span>Escalas</span>
+        </button>
+    ` : '';
+
+    const tempoBtn = hasMenu('tempo') ? `
+        <button class="nav-button" data-view="tempo"> 
+            <i class="ph-fill ph-cloud-sun"></i>
+            <span>Tempo</span>
+        </button>
+    ` : '';
+
+    const relatoriosBtn = hasMenu('relatorios') ? `
+        <button class="nav-button" data-view="relatorios">
+            <i class="ph-fill ph-chart-bar"></i>
+            <span>Relatórios</span>
+        </button>
+    ` : '';
+
+    const parceirosMenu = hasMenu('gerenciamento-terceiros') ? `
         <button class="nav-button" data-view="gerenciamento-terceiros" style="border-left: 3px solid transparent; transition: all 0.2s;">
             <i class="ph-fill ph-handshake" style="color: var(--primary-color);"></i>
             <span style="font-weight: 500;">Parceiros</span>
         </button>
     ` : '';
 
-    // AQUI FOI A MUDANÇA: Menu Gerencial agora é um botão direto
-    const gerencialMenu = isAdmin ? `
+    const gerencialMenu = hasMenu('gerencial') ? `
         <button class="nav-button" data-view="gerencial">
             <i class="ph-fill ph-gear"></i>
             <span>Painel Gerencial</span>
         </button>
     ` : '';
-    
-    // Conteúdo da seção Cadastros (Com a nova ordem)
-    const cadastrosGroup = `
+
+    const cadastrosGroup = hasMenu('cadastros') ? `
         <div class="nav-group" id="cadastros-group">
             <button class="nav-button-group">
                 <i class="ph-fill ph-database"></i>
@@ -75,45 +189,7 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
                 </button>
             </div>
         </div>
-    `;
-
-    // Novo Menu Completo de Frota Própria (Tritrens)
-    const frotaGroup = `
-        <div class="nav-group" id="frota-group">
-            <button class="nav-button-group">
-                <i class="ph-fill ph-truck"></i>
-                <span>Frota Própria</span>
-                ${downtimeCaminhoes > 0 ? `<span class="badge alert" style="margin-left:auto; margin-right:10px;">${downtimeCaminhoes}</span>` : ''}
-                <i class="ph ph-caret-down caret"></i>
-            </button>
-            <div class="submenu">
-                <button class="nav-button" data-view="frota-dashboard">
-                    <i class="ph-fill ph-chart-pie-slice"></i>
-                    <span>Dashboard Frota</span>
-                </button>
-                <button class="nav-button" data-view="frota-abastecimento">
-                    <i class="ph-fill ph-gas-pump"></i>
-                    <span>Combustível e Médias</span>
-                </button>
-                <button class="nav-button" data-view="frota-pneus">
-                    <i class="ph-fill ph-circles-four"></i>
-                    <span>Gestão de Pneus</span>
-                </button>
-                <button class="nav-button" data-view="frota-manutencao">
-                    <i class="ph-fill ph-wrench"></i>
-                    <span>Manutenção (OS)</span>
-                </button>
-                <button class="nav-button" data-view="frota-telemetria">
-                    <i class="ph-fill ph-steering-wheel"></i>
-                    <span>Telemetria</span>
-                </button>
-                <button class="nav-button" data-view="frota-motoristas">
-                    <i class="ph-fill ph-identification-card"></i>
-                    <span>Motoristas</span>
-                </button>
-            </div>
-        </div>
-    `;
+    ` : '';
     
     // Bloco de Perfil minimalista no final
     const profileFooterBlock = `
@@ -149,61 +225,19 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
         </div>
         
         <nav id="main-nav-buttons">
-            <button class="nav-button active" data-view="dashboard">
-                <i class="ph-fill ph-map-trifold"></i>
-                <span>Mapa Principal</span>
-            </button>
-            
-            <button class="nav-button" data-view="boletim-diario">
-                <i class="ph-fill ph-newspaper"></i>
-                <span>Boletim Diário</span>
-            </button>
-            
-            <button class="nav-button" data-view="controle">
-                <i class="ph-fill ph-arrows-clockwise"></i>
-                <span>Painel de Controle</span>
-            </button>
-            
+            ${dashboardBtn}
+            ${boletimBtn}
+            ${controleBtn}
             ${frotaGroup}
-            
-            <button class="nav-button" data-view="equipamentos">
-                <i class="ph-fill ph-tractor"></i>
-                <span>Equipamentos</span>
-                ${downtimeEquipamentos > 0 ? `<span class="badge alert">${downtimeEquipamentos}</span>` : ''}
-            </button>
-            
-            <button class="nav-button" data-view="fila-patio-carregado"> 
-                <i class="ph-fill ph-warehouse"></i>
-                <span>Pátio Carregado</span>
-            </button>
-            
-            <button class="nav-button" data-view="fazendas"> 
-                <i class="ph-fill ph-tree-evergreen"></i>
-                <span>Fazendas</span>
-            </button>
-            <button class="nav-button" data-view="ocorrencias"> 
-                <i class="ph-fill ph-siren"></i>
-                <span>Ocorrências</span>
-            </button>
-
-            <button class="nav-button" data-view="escalas"> 
-                <i class="ph-fill ph-calendar"></i>
-                <span>Escalas</span>
-            </button>
-
-            <button class="nav-button" data-view="tempo"> 
-                <i class="ph-fill ph-cloud-sun"></i>
-                <span>Tempo</span>
-            </button>
-            <button class="nav-button" data-view="relatorios">
-                <i class="ph-fill ph-chart-bar"></i>
-                <span>Relatórios</span>
-            </button>
-            
+            ${equipamentosBtn}
+            ${patioBtn}
+            ${fazendasBtn}
+            ${ocorrenciasBtn}
+            ${escalasBtn}
+            ${tempoBtn}
+            ${relatoriosBtn}
             ${parceirosMenu}
-            
             ${gerencialMenu}
-            
             ${cadastrosGroup}
         </nav>
         

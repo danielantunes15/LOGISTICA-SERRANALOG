@@ -280,32 +280,28 @@ export async function fetchTable(tableName, select = '*') {
  * Realiza o login do usuário contra a tabela app_users (SEGURO).
  */
 export async function loginAppUser(username, password) {
-    // Validações básicas
     if (!username || !password) {
         throw new Error('Usuário e senha são obrigatórios.');
     }
 
     const cleanUsername = username.trim().toLowerCase();
 
-    // Verifica se está bloqueado
     if (isUserLockedOut(cleanUsername)) {
         const remainingTime = Math.ceil((LOCKOUT_TIME - (Date.now() - loginAttempts.get(cleanUsername).lastAttempt)) / 60000);
         throw new Error(`Muitas tentativas falhas. Tente novamente em ${remainingTime} minutos.`);
     }
 
     try {
-        // 1. Consulta a tabela para buscar o usuário e o HASH da senha
+        // MUDANÇA: Adicionado 'menus_permitidos' no select
         const { data, error } = await supabase
             .from('app_users')
-            .select('id, username_app, nome_completo, tipo_usuario, senha_app, primeiro_login, ativo, ultimo_login')
+            .select('id, username_app, nome_completo, tipo_usuario, senha_app, primeiro_login, ativo, ultimo_login, menus_permitidos')
             .eq('username_app', cleanUsername)
             .single();
 
-        // Proteção contra timing attacks - sempre executa comparação
         const fakeHash = '$2b$12$fakeHashForTimingProtection.fake';
         const hashedPassword = data?.senha_app || fakeHash;
 
-        // Sempre executa a comparação para evitar timing attacks
         const isPasswordValid = await comparePassword(password, hashedPassword);
 
         if (error || !data || !isPasswordValid) {
@@ -313,21 +309,18 @@ export async function loginAppUser(username, password) {
             throw new Error(`Credenciais inválidas. ${attemptsLeft > 0 ? `${attemptsLeft} tentativas restantes.` : 'Conta bloqueada temporariamente.'}`);
         }
 
-        // Verifica se usuário está ativo
         if (data.ativo === false) {
             throw new Error('Conta inativa. Contate o administrador do sistema.');
         }
 
-        // Limpa tentativas após sucesso
         clearLoginAttempts(cleanUsername);
 
-        // Atualiza último login
         await supabase
             .from('app_users')
             .update({ ultimo_login: new Date().toISOString() })
             .eq('id', data.id);
 
-        // Cria sessão segura
+        // MUDANÇA: Adicionado 'menus_permitidos' na sessão
         const sessionData = {
             id: data.id,
             username: data.username_app,
@@ -335,20 +328,18 @@ export async function loginAppUser(username, password) {
             fullName: data.nome_completo,
             isFirstLogin: data.primeiro_login === true,
             loginTime: Date.now(),
-            sessionId: generateSessionId()
+            sessionId: generateSessionId(),
+            menus_permitidos: data.menus_permitidos || [] // <-- AQUI
         };
 
-        // Salva sessão no SESSIONSTORAGE (MUDANÇA APLICADA AQUI)
         localUserSession = sessionData;
         sessionStorage.setItem(USER_SESSION_KEY, JSON.stringify(sessionData));
 
-        // Registra log de login bem-sucedido
         await logUserAction(data.id, 'LOGIN_SUCCESS', `Usuário ${data.username_app} fez login`);
 
         return sessionData;
 
     } catch (error) {
-        // Registra log de tentativa falha
         await logUserAction(null, 'LOGIN_FAILED', `Tentativa de login falha para usuário: ${username}`);
 
         if (error.code === 'PGRST116') {
@@ -480,7 +471,7 @@ export async function updateAppUser(userId, updateData) {
         }
     }
 
-    // 2. Atualiza os dados (agora incluindo 'ativo')
+    // 2. Atualiza os dados (agora incluindo 'ativo' e 'menus_permitidos')
     const { data, error: updateError } = await supabase
         .from('app_users')
         .update(updateData)
@@ -499,13 +490,15 @@ export async function updateAppUser(userId, updateData) {
 /**
  * Registra um novo usuário na tabela app_users (SEGURO).
  */
-export async function registerAppUser(username_app, password, nome_completo, tipo_usuario) {
+export async function registerAppUser(userData) {
+    const { username_app, senha, nome_completo, tipo_usuario, ativo, menus_permitidos } = userData;
+
     // Validações
-    if (!username_app || !password || !nome_completo) {
+    if (!username_app || !senha || !nome_completo) {
         throw new Error('Todos os campos são obrigatórios.');
     }
 
-    if (password.length < 6) {
+    if (senha.length < 6) {
         throw new Error('A senha deve ter pelo menos 6 caracteres.');
     }
 
@@ -523,16 +516,17 @@ export async function registerAppUser(username_app, password, nome_completo, tip
     }
 
     // GERA O HASH DA SENHA ANTES DE SALVAR
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(senha);
 
-    // 2. Insere o novo registro (SALVANDO O HASH)
+    // 2. Insere o novo registro (SALVANDO O HASH e AS PERMISSÕES)
     const { data, error: insertError } = await supabase.from('app_users').insert({
         nome_completo: nome_completo,
-        tipo_usuario: tipo_usuario,
+        tipo_usuario: tipo_usuario || 'usuario',
         username_app: cleanUsername,
         senha_app: hashedPassword, // Salva o HASH da senha
         primeiro_login: true,
-        ativo: true
+        ativo: ativo !== undefined ? ativo : true,
+        menus_permitidos: menus_permitidos || [] // Salva os menus liberados
     }).select().single();
 
     if (insertError) throw insertError;
@@ -544,11 +538,15 @@ export async function registerAppUser(username_app, password, nome_completo, tip
 }
 
 /**
- * Busca todos os usuários da aplicação (Gerencial) - Incluindo o status 'ativo'.
+ * Busca todos os usuários da aplicação (Gerencial) - Incluindo status e menus permitidos.
  */
 export async function fetchAppUsers() {
-    // Busca a lista de perfis (incluindo o ID para exclusão e o novo campo 'ativo')
-    const { data, error } = await supabase.from('app_users').select('id, nome_completo, tipo_usuario, username_app, ativo, ultimo_login').order('username_app');
+    // Busca a lista de perfis (incluindo o ID, ativo e menus_permitidos)
+    const { data, error } = await supabase
+        .from('app_users')
+        .select('id, nome_completo, tipo_usuario, username_app, ativo, ultimo_login, menus_permitidos')
+        .order('username_app');
+        
     if (error) throw error;
     return data;
 }
