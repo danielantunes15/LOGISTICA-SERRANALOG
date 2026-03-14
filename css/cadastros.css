@@ -1,0 +1,401 @@
+/* CSS Específico para Cadastros */
+.cadastro-container {
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.cadastro-header {
+    margin-bottom: 24px;
+}
+
+.cadastro-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #38A169, #2B6CB0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+/* MODIFICADO: Aumenta a proporção do mapa para 500px na coluna do formulário e 1fr (o resto) no mapa */
+.cadastro-content {
+    display: grid;
+    grid-template-columns: 500px 1fr; 
+    gap: 24px;
+    height: calc(100vh - 150px);
+}
+
+/* Formulário Moderno */
+.form-section-modern {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    height: fit-content;
+}
+
+.form-section-modern h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-input {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.2);
+}
+
+/* NOVO: Estilo para campo inválido */
+.form-input.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--accent-danger) !important;
+    box-shadow: 0 0 0 2px rgba(197, 48, 48, 0.2) !important;
+}
+
+/* NOVO: Estilo para mensagem de erro de validação */
+.validation-message {
+    font-size: 0.75rem;
+    color: var(--accent-danger);
+    margin-top: -4px;
+    font-weight: 500;
+}
+
+
+.form-select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.2);
+}
+
+.form-submit {
+    background: linear-gradient(135deg, #38A169, #2F855A);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.form-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+}
+
+/* Mapa no Cadastro */
+.cadastro-map-container {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cadastro-map-container h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.map-instructions {
+    background: rgba(56, 161, 105, 0.1);
+    border: 1px solid rgba(56, 161, 105, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.map-instructions p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.map-instructions i {
+    color: var(--accent-primary);
+}
+
+/* MODIFICADO: Aumenta a altura do mapa de cadastro */
+#map-cadastro-medio {
+    height: 550px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+/* Tabela Moderna */
+.list-container-modern {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.list-container-modern h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table-modern thead {
+    background: var(--bg-light);
+}
+
+.data-table-modern th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table-modern td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.data-table-modern tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.data-table-modern tbody tr:hover {
+    background: rgba(74, 85, 104, 0.3);
+}
+
+.data-table-modern tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Ações na Tabela */
+.action-buttons-modern {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn-modern {
+    color: var(--accent-edit);
+    background: rgba(43, 108, 176, 0.1);
+}
+
+.edit-btn-modern:hover {
+    background: rgba(43, 108, 176, 0.2);
+}
+
+.delete-btn-modern {
+    color: var(--accent-danger);
+    background: rgba(197, 48, 48, 0.1);
+}
+
+.delete-btn-modern:hover {
+    background: rgba(197, 48, 48, 0.2);
+}
+
+/* Estados Vazios */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    .cadastro-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .form-section-modern {
+        order: 2;
+    }
+    
+    .cadastro-map-container {
+        order: 1;
+    }
+    
+    /* MODIFICADO: Ajuste de altura para telas menores */
+    #map-cadastro-medio {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cadastro-container {
+        padding: 16px;
+    }
+    
+    .form-section-modern,
+    .cadastro-map-container,
+    .list-container-modern {
+        padding: 20px;
+    }
+    
+    .data-table-modern {
+        font-size: 0.8rem;
+    }
+    
+    .data-table-modern th,
+    .data-table-modern td {
+        padding: 12px 8px;
+    }
+}
+/* Adicionar ao cadastros.css */
+
+/* Select Múltiplo Estilizado */
+.form-select[multiple] {
+    height: 120px;
+    resize: vertical;
+}
+
+.form-select[multiple] option {
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.form-select[multiple] option:hover {
+    background-color: rgba(56, 161, 105, 0.1);
+}
+
+.form-select[multiple] option:checked {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+/* Campos de Telefone e CPF/CNPJ */
+.form-input[type="tel"] {
+    font-family: monospace;
+}
+
+/* Indicador de Select Múltiplo */
+.select-multiple-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.select-multiple-hint i {
+    font-size: 0.7rem;
+}
+
+/* Estados dos formulários */
+.form-group:focus-within label {
+    color: var(--accent-primary);
+}
+
+/* Loading states */
+.form-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Mensagens de ajuda nos formulários */
+.form-help {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}

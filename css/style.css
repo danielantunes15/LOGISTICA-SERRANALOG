@@ -1,0 +1,850 @@
+/* css/style.css */
+:root {
+    --bg-dark: #1A202C;
+    --bg-light: #2D3748;
+    --border-color: #4A5568;
+    --text-primary: #F7FAFC;
+    --text-secondary: #A0AEC0;
+    --accent-primary: #38A169;
+    --accent-hover: #2F855A;
+    --accent-danger: #C53030;
+    --accent-edit: #2B6CB0;
+    --font-family: 'Poppins', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body { 
+    font-family: var(--font-family); 
+    background-color: var(--bg-dark); 
+    color: var(--text-primary); 
+    display: flex; 
+}
+
+/* Layout Base */
+.sidebar { 
+    width: 260px; 
+    height: 100%; 
+    background-color: var(--bg-light); 
+    border-right: 1px solid var(--border-color); 
+    padding: 24px 24px 24px 24px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    flex-shrink: 0; 
+    overflow-y: auto; 
+}
+
+.sidebar-header { 
+    padding-bottom: 24px; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+.sidebar-header i { 
+    /* Antigo ícone do trator - agora oculto */
+    display: none; 
+}
+
+.sidebar-header #sidebar-logo { 
+    /* NOVO: Estilo para o logo na sidebar */
+    width: 48px; 
+    height: 48px; 
+    object-fit: contain;
+}
+
+.sidebar-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary); 
+    background: none; 
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--text-primary); 
+    background-clip: unset;
+}
+
+.main-content { 
+    flex-grow: 1; 
+    height: 100%; 
+    position: relative; 
+    overflow: hidden;
+}
+
+/* Navegação */
+.sidebar nav { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+    flex-grow: 1; 
+    overflow-y: visible; 
+    padding-bottom: 5px; 
+}
+.nav-button, .nav-button-group { 
+    width: 100%; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 12px; 
+    border-radius: 6px; 
+    background-color: transparent; 
+    border: none; 
+    color: var(--text-secondary); 
+    font-family: var(--font-family); 
+    font-size: 16px; 
+    font-weight: 500; 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    text-align: left; 
+}
+.nav-button:hover, .nav-button-group:hover { 
+    background-color: rgba(74, 85, 104, 0.4); 
+    color: var(--text-primary); 
+}
+.nav-button.active { 
+    background-color: var(--accent-primary); 
+    color: white; 
+}
+.nav-button i, .nav-button-group i { font-size: 20px; }
+.nav-button-group .caret { 
+    margin-left: auto; 
+    transition: transform 0.3s ease; 
+}
+.nav-group.open .nav-button-group .caret { 
+    transform: rotate(180deg); 
+}
+.submenu { 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.3s ease-in-out; 
+    padding-left: 20px; 
+}
+.submenu .nav-button { 
+    padding: 10px 12px; 
+    font-size: 15px; 
+}
+.nav-group.open .submenu { 
+    max-height: 500px; 
+}
+
+/* --- NOVO ESTILO: BADGE DE NOTIFICAÇÃO NA SIDEBAR --- */
+.badge {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: white;
+    min-width: 24px;
+    text-align: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0; 
+}
+
+/* Badge de Alerta Crítico (Quebrado/Parado) */
+.badge.alert {
+    background-color: var(--accent-danger); 
+}
+
+/* Badge de Aviso (Descarga/Atenção) */
+.badge.warning {
+    background-color: #ED8936; /* Laranja */
+}
+
+.nav-button:hover .badge {
+    /* Mantém o badge visível e com cor sólida no hover */
+    opacity: 1;
+}
+
+/* Views */
+.view { 
+    display: none; 
+    width: 100%; 
+    height: 100%; 
+    animation: fadeIn 0.5s ease; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    overflow-y: auto; 
+}
+.view.active-view { display: block; z-index: 1; }
+
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: none; 
+    color: var(--text-primary); 
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--text-primary); 
+    background-clip: unset;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Mapa Fullscreen */
+.map-fullscreen {
+    position: relative;
+    height: calc(100vh - 80px);
+    width: 100%;
+}
+
+#dashboard-map {
+    height: 100%;
+    width: 100%;
+}
+
+/* --- NOVO: Remove qualquer fundo ou borda dos contêineres do ícone Leaflet --- */
+.fazenda-marker, .usina-marker {
+    background: transparent !important;
+    border: none !important;
+}
+/* --- FIM NOVO --- */
+
+/* Marcadores Personalizados (Mantidos aqui pois são globais/do mapa) */
+.marker-pin {
+    /* Base do pino: Círculo */
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important; /* ALTERADO: Remove a sombra residual */
+    /* Remove a inclinação */
+    transform: rotate(0deg); 
+    margin: 0; 
+}
+
+/* O ponto de ancoragem (a gota) */
+.marker-pin::after { 
+    content: '';
+    position: absolute;
+    bottom: -15px; /* Ponto fora do círculo */
+    width: 15px;
+    height: 15px;
+    background: inherit; 
+    transform: rotate(45deg);
+    border-bottom-right-radius: 50%;
+    left: 50%; 
+    margin-left: -7.5px; 
+    z-index: -1; 
+}
+
+/* Tamanhos e Posições */
+.usina-marker .marker-pin {
+    /* MUDANÇA DE COR: Para #805AD5 (Roxo) */
+    background: #805AD5; 
+    width: 45px; 
+    height: 45px; 
+    margin: 0;
+}
+
+.fazenda-marker .marker-pin {
+    width: 40px; 
+    height: 40px; 
+    margin: 0; 
+}
+
+/* O Ícone (Árvore/Fábrica) */
+.marker-pin i {
+    position: relative;
+    z-index: 2;
+    /* CORREÇÃO FINAL: Cor do ícone interna é BRANCA para alto contraste */
+    color: white; 
+    font-size: 18px; /* Aumentado */
+    transform: rotate(0deg); 
+}
+
+
+.marker-pulse {
+    /* MANTIDO: Pulse fica na base do marcador */
+    border-radius: 50%;
+    height: 14px;
+    width: 14px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -7px 0 0 -7px;
+    transform: rotateX(55deg);
+    z-index: -2;
+}
+
+.marker-pulse::after {
+    content: "";
+    border-radius: 50%;
+    height: 50px; /* AUMENTADO */
+    width: 50px; /* AUMENTADO */
+    position: absolute;
+    margin: -18px 0 0 -18px; /* Ajuste para pulso maior */
+    animation: pulsate 1.5s ease-out infinite;
+    opacity: 0;
+    box-shadow: 0 0 1px 3px currentColor; /* Usa a cor dinâmica definida no JS */
+    animation-delay: 0.5s; /* Pulso mais rápido */
+}
+
+/* Cores específicas da usina (Roxo) */
+.usina-marker .marker-pin i {
+    color: white;
+}
+
+.usina-marker .marker-pulse {
+    background: #805AD5; 
+}
+
+.usina-marker .marker-pulse::after {
+    box-shadow: 0 0 1px 3px #805AD5; 
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(0.1, 0.1);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.4, 1.4); 
+        opacity: 0;
+    }
+}
+
+/* Popup Personalizado - REGRAS DE ALTO CONTRASTE E AÇÃO */
+.fazenda-popup {
+    min-width: 250px; /* Aumentar largura mínima para melhor leitura */
+    padding: 5px 0 0 0; /* Ajustar padding */
+}
+
+.fazenda-popup h4 {
+    margin: 0 0 8px 0;
+    color: #1A202C; /* Corrigido para Dark, para alto contraste */
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Sombra mais leve */
+    padding: 0 10px;
+}
+
+.popup-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem; /* Aumentar um pouco */
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 12px; /* Aumentar margem */
+    margin-left: 10px; /* Alinhar com o conteúdo */
+}
+
+.popup-status.colhendo, .popup-status.ativa {
+    background: rgba(56, 161, 105, 0.2);
+    color: #38A169;
+}
+
+.popup-status.fazendo_cata {
+    background: rgba(237, 137, 54, 0.2);
+    color: #ED8936; /* Laranja para Cata */
+}
+
+.popup-status.inativa {
+    /* MUDANÇA DE COR: Vermelho (cor da variável CSS --accent-danger) */
+    background: rgba(197, 48, 48, 0.2);
+    color: var(--accent-danger); 
+}
+
+.popup-status i {
+    font-size: 6px;
+}
+
+.popup-details {
+    font-size: 0.9rem; /* Aumentar o tamanho do texto para legibilidade */
+    padding: 0 10px;
+}
+
+.popup-details p {
+    margin: 8px 0;
+    color: #4A5568; /* Dark Gray para texto base, garantindo contraste */
+    display: flex;
+    justify-content: space-between; /* Alinhar rótulo e valor */
+    align-items: center;
+}
+
+.popup-details strong {
+    color: #1A202C; /* Near Black para RÓTULOS, destacando sobre o fundo branco */
+    font-weight: 600;
+    flex-grow: 1; /* Permite que o rótulo ocupe mais espaço */
+    margin-right: 10px;
+}
+
+.popup-details .value {
+    color: #1A202C; /* Near Black como valor padrão */
+    font-weight: 800; /* Deixar o valor mais forte */
+}
+
+/* Sobrescreve a cor dos valores dinâmicos para a cor de status, exceto se for o default dark */
+.popup-details .value[style*="var(--text-secondary)"] {
+    color: var(--text-secondary) !important;
+}
+
+/* NOVO ESTILO PARA AÇÕES NO POPUP */
+.popup-actions {
+    padding: 10px 10px 0 10px;
+    border-top: 1px solid rgba(74, 85, 104, 0.3); /* Linha divisória */
+    margin-top: 10px;
+}
+.popup-actions .btn-action-map {
+    width: 100%;
+    justify-content: center;
+    padding: 8px;
+    font-size: 0.9rem;
+}
+
+
+/* Controles Personalizados do Mapa */
+.custom-map-control {
+    background: rgba(26, 32, 44, 0.9);
+    border-radius: 8px;
+    border: 1px solid rgba(74, 85, 104, 0.3);
+    overflow: hidden;
+}
+
+.map-control-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.map-control-btn:hover {
+    background: rgba(74, 85, 104, 0.3);
+}
+
+.map-control-btn i {
+    font-size: 16px;
+}
+
+/* Botões */
+.btn-primary, .btn-secondary {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--bg-light);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    width: 90%;
+    max-width: 750px; /* ALTERADO: Aumentado para 700px */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: scale(0.95);
+    transition: all 0.3s ease-in-out;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.modal-header .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-header .close-btn:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+.modal-actions .btn-primary {
+    background-color: var(--accent-danger);
+}
+.modal-actions .btn-primary:hover {
+    background-color: #a52a2a;
+}
+
+/* --- NOVOS ESTILOS PARA NOTIFICAÇÕES (TOAST) --- */
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-left: 5px solid; /* A cor será definida por tipo */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 300px;
+    animation: slideInRight 0.5s forwards, fadeOut 0.5s 3.5s forwards;
+}
+
+.toast i {
+    font-size: 24px;
+}
+
+/* Toast de Sucesso */
+.toast.success {
+    border-color: var(--accent-primary);
+}
+.toast.success i {
+    color: var(--accent-primary);
+}
+
+/* Toast de Erro */
+.toast.error {
+    border-color: var(--accent-danger);
+}
+.toast.error i {
+    color: var(--accent-danger);
+}
+
+/* Toast de Informação */
+.toast.info {
+    border-color: var(--accent-edit);
+}
+.toast.info i {
+    color: var(--accent-edit);
+}
+
+/* Animações do Toast */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* --- FIM DOS ESTILOS DE TOAST --- */
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 5px solid var(--accent-primary);
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* Animações */
+@keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    
+    .modern-dashboard-overlay {
+        left: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .dashboard-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    /* Reduz o max-width do modal em telas muito pequenas para evitar que ele estoure */
+    .modal-content {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 180px;
+    }
+    
+    .modern-dashboard-overlay {
+        left: 5px;
+        right: 5px;
+    }
+}
+
+/* --- NOVOS ESTILOS PARA O MENU DE PERFIL NO RODAPÉ (COMPACTADO) --- */
+
+.profile-menu-container {
+    padding-top: 10px; 
+    border-top: 1px solid var(--border-color);
+    margin-top: auto; 
+    position: relative;
+    z-index: 50; 
+}
+
+.nav-profile-button {
+    /* Estilo do botão "Meu Perfil" - Corrigido para ser compacto */
+    width: 100%;
+    justify-content: flex-start;
+    padding: 8px 12px; /* Padding reduzido verticalmente */
+    border-radius: 6px;
+    background-color: var(--accent-edit); 
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    height: 40px; /* Altura fixa para evitar expansão */
+}
+
+.nav-profile-button:hover {
+    background-color: #26558d;
+}
+
+.profile-menu-container.open .nav-profile-button {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.nav-profile-button i.ph-user-circle {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Estilo para o span do nome dentro do botão */
+.nav-profile-button span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block; /* Garante que o overflow e ellipsis funcionem */
+    max-width: 150px; /* Limita a largura do texto do nome */
+    margin-right: 5px;
+}
+
+/* Rotação do Caret */
+.profile-menu-container.open .nav-profile-button .caret {
+    transform: rotate(180deg);
+}
+
+.profile-submenu {
+    /* O submenu que aparece acima do botão */
+    position: absolute;
+    bottom: 100%; 
+    left: 0;
+    right: 0;
+    background-color: var(--bg-light); 
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+    
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.3s ease-in-out; 
+    
+    padding: 0; 
+    z-index: 40;
+}
+
+.profile-menu-container.open .profile-submenu {
+    max-height: 200px; 
+    padding: 5px 0 0 0;
+}
+
+/* NOVO: Estilos para o cabeçalho do submenu (detalhes do usuário) */
+.profile-submenu-header {
+    padding: 8px 12px; /* Padding reduzido */
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.profile-submenu-header .user-name-header {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 2px;
+}
+
+.profile-submenu-header .user-role-header {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.profile-submenu-divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 5px 0; 
+}
+
+/* Estilo do botão Sair dentro do submenu */
+.profile-submenu .nav-button.btn-danger {
+    background-color: rgba(197, 48, 48, 0.1);
+    color: var(--accent-danger);
+    margin-top: 5px;
+    padding: 10px 12px;
+}
+
+.profile-submenu .nav-button.btn-danger:hover {
+    background-color: var(--accent-danger);
+    color: white;
+}
+
+/* Remove estilos antigos relacionados ao bloco de topo */
+.user-info-block, .user-info-block-wrapper, .logout-btn-top, .sidebar-divider {
+    /* Garante que os estilos de topo anteriores não causem conflito */
+    display: none !important; 
+}
+
+/* --- FIM NOVOS ESTILOS --- */

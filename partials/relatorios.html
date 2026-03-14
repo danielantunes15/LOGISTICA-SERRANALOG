@@ -1,0 +1,39 @@
+<div id="relatorios-view" class="view">
+    <div class="report-header">
+        <h1>Relatórios Gerenciais</h1>
+    </div>
+    
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3>Horas Trabalhadas (Caminhões e Equipamentos)</h3>
+            <div class="chart-wrapper">
+                <canvas id="workHoursChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>Horas de Inatividade (Parado / Quebrado)</h3>
+            <div class="chart-wrapper">
+                <canvas id="downtimeHoursChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Produtividade por Frente (MOCK)</h3>
+            <div class="chart-wrapper">
+                <canvas id="productivityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-export">
+        <button class="btn-secondary" id="export-pdf">
+            <i class="ph-fill ph-file-pdf"></i>
+            Exportar PDF
+        </button>
+        <button class="btn-secondary" id="export-excel">
+            <i class="ph-fill ph-file-xls"></i>
+            Exportar Excel
+        </button>
+    </div>
+</div>

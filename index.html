@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGÍSTICA SERRANALOG | Torre de Controle</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cadastros.css">
+    <link rel="stylesheet" href="css/controle.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/frota.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/escala.css">
+    <link rel="stylesheet" href="css/tempo.css"> 
+    <link rel="stylesheet" href="css/boletimProducao.css">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-83VVSREGXL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-83VVSREGXL');
+    </script>
+</head>
+<body>
+    
+    <div id="login-container" class="login-container" style="display: flex;">
+    </div>
+    
+    <div id="app-container" style="display: none; height: 100%; width: 100%;">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <div id="views-container"></div>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    <div id="modal-container"></div>
+    
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,802 @@
+/* css/controle.css */
+
+.controle-view {
+    padding: 0; 
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    /* Rolagem vertical da página inteira está ATIVADA */
+}
+
+.controle-header {
+    padding: 16px 24px 0 24px;  
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px; 
+}
+
+.controle-header h1 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin: 0; 
+}
+
+/* --- LEGENDA --- */
+.movimentacao-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px; 
+    padding: 10px 24px 15px 24px; 
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-dark); 
+    flex-shrink: 0;
+}
+.legend-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-right: 10px;
+    align-self: center;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.legend-color-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.legend-label {
+    font-size: 0.7rem; 
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+/* --- FIM LEGENDA --- */
+
+
+.controle-dashboard-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+    /* NOVO: Adicionado padding que faltava (movido do renderMinimalistDashboard) */
+    padding: 24px 24px 0 24px;
+}
+
+.summary-card {
+    background-color: var(--bg-light);
+    border-radius: 12px;
+    padding: 20px;
+    border-bottom: 4px solid;
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Adicionado box-shadow na transição */
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+}
+
+/* --- INÍCIO DA CORREÇÃO: Feedback visual para cards clicáveis --- */
+.clickable-dashboard-card:hover {
+    cursor: pointer; /* Muda o cursor para a "mãozinha" */
+    box-shadow: 0 0 15px rgba(56, 161, 105, 0.5); /* Adiciona um brilho sutil (verde) */
+    border-bottom-color: var(--accent-hover); /* Escurece a borda inferior no hover */
+}
+/* --- FIM DA CORREÇÃO --- */
+
+
+.summary-card-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.summary-card-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+/* Cores dos cards do dashboard */
+.summary-indo_carregar { border-color: #2B6CB0; }
+.summary-carregando { border-color: #D69E2E; }
+.summary-retornando { border-color: #805AD5; }
+.summary-patio_carregado { border-color: #D53F8C; }
+.summary-patio_vazio { border-color: #A0AEC0; }
+.summary-descarregando { border-color: #38A169; }
+.summary-quebrado { border-color: var(--accent-danger); }
+.summary-disponivel { border-color: var(--accent-primary); } 
+.summary-parado { border-color: #ED8936; } 
+
+/* --- CABEÇALHO DO GRUPO --- */
+.frente-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px; 
+    margin-bottom: 12px; 
+    padding: 0 5px; 
+}
+
+.frente-group-header h2 {
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+    margin: 0;
+}
+
+.frente-group-truck-count {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-light);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.frente-group-truck-count i {
+    font-size: 1.3rem;
+}
+/* --- FIM CABEÇALHO GRUPO --- */
+
+
+.controle-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px; 
+    margin-bottom: 16px; 
+    margin-top: 0;
+}
+
+.empty-state-frente-grid {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: rgba(45, 55, 72, 0.3);
+    border-radius: 8px;
+}
+
+
+.frente-card {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.frente-header {
+    background-color: #374151;
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.frente-header-main {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    margin-bottom: 12px; 
+}
+
+.frente-header-main i { font-size: 20px; color: var(--accent-primary); } 
+.frente-header-main h3 { font-size: 1.0rem; color: var(--text-primary); margin: 0; }
+
+.frente-fazenda-info { display: flex; justify-content: space-between; align-items: center; background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
+.fazenda-display { display: flex; align-items: center; gap: 8px; }
+.fazenda-display i { color: var(--text-secondary); }
+.fazenda-nome { font-weight: 500; font-size: 0.85rem; } 
+.fazenda-codigo { font-size: 0.75rem; color: var(--text-secondary); background-color: var(--bg-dark); padding: 2px 8px; border-radius: 6px; }
+.btn-alterar-fazenda { padding: 6px 12px; font-size: 0.8rem; background-color: var(--bg-light); }
+
+.frente-body {
+    padding: 12px;
+    flex-grow: 1;
+}
+
+.frente-body h4 {
+    font-size: 0.85rem; 
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.caminhoes-em-operacao-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.caminhoes-em-operacao-table th, .caminhoes-em-operacao-table td {
+    padding: 8px 5px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.caminhoes-em-operacao-table th {
+    font-size: 0.75rem; 
+    color: var(--text-secondary);
+    white-space: nowrap; 
+}
+
+.caminhoes-em-operacao-table td {
+    font-size: 0.85rem;
+}
+
+.caminhoes-em-operacao-table th:nth-child(1),
+.caminhoes-em-operacao-table td:nth-child(1) {
+    width: 30%; /* Cód. */
+}
+
+.caminhoes-em-operacao-table th:nth-child(2),
+.caminhoes-em-operacao-table td:nth-child(2) {
+    width: 40%; /* Status */
+    white-space: normal; 
+}
+
+.caminhoes-em-operacao-table th:nth-child(3),
+.caminhoes-em-operacao-table td:nth-child(3) {
+    width: 30%; /* Ações */
+    text-align: center; 
+}
+
+.caminhoes-em-operacao-table .btn-primary {
+    font-size: 0.75rem !important;
+    padding: 5px 8px !important;
+}
+
+
+.frente-status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.frente-status-actions {
+    margin-bottom: 15px;
+}
+
+.status-ativa { background-color: var(--accent-primary); } 
+.status-inativa { background-color: #718096; } 
+.status-fazendo_cata { background-color: #D69E2E; } 
+
+
+.caminhao-status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.caminhoes-em-operacao-table .caminhao-status-badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+}
+
+
+/* Cores dos status */
+.status-indo_carregar { background-color: #2B6CB0; }
+.status-carregando { background-color: #D69E2E; }
+.status-retornando { background-color: #805AD5; }
+.status-patio_carregado { background-color: #D53F8C; }
+.status-patio_vazio { background-color: #A0AEC0; }
+.status-descarregando { background-color: #38A169; }
+.status-disponivel { background-color: #718096; }
+.status-quebrado { background-color: var(--accent-danger); }
+.status-parado { background-color: #ED8936; } 
+
+
+.historico-container { background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+.historico-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.historico-header h2 { font-size: 1.5rem; color: var(--text-primary); }
+
+.data-table-modern { width: 100%; border-collapse: collapse; }
+.data-table-modern th, .data-table-modern td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+.data-table-modern th { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; }
+.data-table-modern tbody tr:hover { background-color: rgba(74, 85, 104, 0.2); }
+
+.action-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* --- ESTACIONAMENTO (DRAG AND DROP) --- */
+
+.fila-main-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr; 
+    gap: 24px;
+    padding: 24px;
+}
+
+.fila-queues-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 24px;
+}
+
+.fila-disponiveis-panel,
+.fila-queue-panel {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 150px); 
+    overflow: hidden;
+}
+
+.fila-disponiveis-panel h2,
+.fila-queue-panel h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.truck-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 5px; 
+}
+
+.truck-card {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab; 
+    transition: all 0.2s ease;
+}
+
+.truck-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    border-color: var(--accent-primary);
+    box-shadow: 0 5px 15px rgba(56, 161, 105, 0.3);
+}
+
+.truck-card.drag-placeholder {
+    border: 2px dashed var(--accent-primary);
+    background-color: rgba(56, 161, 105, 0.1);
+    color: var(--accent-primary);
+    text-align: center;
+    font-weight: 600;
+    line-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    cursor: default;
+}
+
+.truck-cod {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.truck-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.8rem;
+}
+
+.truck-entry-time {
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.drag-icon {
+    font-size: 1.2rem;
+    color: var(--border-color);
+}
+
+.queue-status-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    text-align: center;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 10px;
+}
+
+.empty-state-list {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state-list i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .fila-main-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .fila-queues-grid {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+
+    .fila-disponiveis-panel,
+    .fila-queue-panel {
+        height: auto;
+        min-height: 300px;
+    }
+
+    .controle-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .fila-queues-grid {
+        grid-template-columns: 1fr; 
+    }
+    
+    .controle-view {
+        padding: 16px; 
+    }
+    
+    .controle-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .controle-header h1 {
+        font-size: 1.5rem; 
+        margin: 0;
+        width: 100%; 
+    }
+
+    .controle-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .controle-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* --- FILA DE DESCARGA (COLUNAS DINÂMICAS) --- */
+.descarga-grid {
+    display: grid;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.descarga-coluna {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px; 
+}
+
+.descarga-frente-title {
+    font-size: 1.1rem; 
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 12px; 
+    padding-bottom: 8px; 
+    border-bottom: 2px solid var(--accent-primary);
+    text-align: center;
+}
+
+.descarga-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.descarga-card {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    padding: 10px; 
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-left: 5px solid var(--accent-primary);
+}
+
+.descarga-card:hover {
+    background-color: #262c38; 
+    transform: translateY(-1px);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(56, 161, 105, 0.3);
+}
+
+.descarga-info-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.descarga-cod {
+    font-size: 0.95rem; 
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.descarga-frente-origem {
+    font-size: 0.7rem; 
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.descarga-time {
+    font-size: 0.8rem; 
+    color: var(--text-secondary);
+}
+
+.empty-state-descarga {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state-descarga i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #718096;
+}
+
+@media (max-width: 1400px) {
+    .descarga-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .descarga-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* --- TABELA DE MOVIMENTAÇÃO (MATRIZ) --- */
+
+.report-table-container {
+    padding: 0 24px; 
+    display: flex; 
+    flex-direction: column;
+}
+
+.report-table-container .table-wrapper {
+    overflow-x: hidden; /* <-- CHAVE: Desliga a rolagem horizontal */
+}
+
+.report-table-container .data-table-modern {
+    table-layout: fixed; /* <-- CHAVE: Força a tabela a obedecer as larguras */
+    width: 100%; /* <-- CHAVE: Força a tabela a ter 100% do wrapper */
+    min-width: 0 !important; /* <-- CHAVE: Sobrescreve o 'min-width: 1500px' do JS */
+}
+
+
+.data-table-modern .mov-header-group-title {
+    text-align: center;
+    background-color: var(--accent-edit); 
+    color: white;
+    font-size: 1.0rem; 
+    padding: 6px; 
+}
+
+.data-table-modern .mov-header-slots th {
+    background-color: var(--bg-dark);
+    font-size: 0.75rem; 
+    padding: 6px 4px; 
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table-modern .mov-frente-name {
+    text-align: left;
+    background-color: var(--bg-light);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 8px; /* <-- Padding ajustado */
+    border-left: 5px solid var(--accent-primary);
+    white-space: normal; /* <-- CHAVE: Permite a quebra de linha */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease; 
+}
+
+.data-table-modern .mov-frente-name.clickable-front:hover {
+    cursor: pointer;
+    background-color: #374151; 
+    box-shadow: inset 3px 0 0 var(--accent-primary);
+}
+
+
+.data-table-modern .mov-frente-name i {
+    color: var(--accent-primary);
+    margin-right: 5px;
+    font-size: 1.1rem;
+}
+
+.data-table-modern .frente-name-text {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.85rem; /* <-- Fonte diminuída */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* NOVO: Seletor para a linha da Fazenda */
+.data-table-modern .frente-fazenda-text {
+    font-size: 0.75rem; /* <-- Fonte controlada */
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.data-table-modern .frente-group-text {
+    font-size: 0.65rem; /* <-- Fonte diminuída */
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.data-table-modern .mov-cell {
+    /* min-width foi removido */
+    text-align: center;
+    padding: 3px; 
+    vertical-align: top;
+    border: 1px solid var(--border-color); 
+    height: 36px; 
+    transition: background-color 0.2s ease; 
+}
+
+.data-table-modern .mov-cell.has-data {
+    background-color: rgba(56, 161, 105, 0.1); 
+}
+
+/* 🛑 NOVO: Estilos para forçar o empilhamento vertical dos badges */
+/* Wrapper para os grupos de stacks */
+.mov-stacks-wrapper {
+    display: flex; /* Faz os grupos de 3 fluírem horizontalmente */
+    flex-direction: row;
+    gap: 2px; /* Espaço entre as pilhas verticais */
+    justify-content: center; /* Centraliza as pilhas na célula */
+    flex-wrap: wrap; /* Permite quebrar a linha se houver muitas pilhas */
+}
+
+/* Um grupo (pilha) vertical de até 3 badges */
+.mov-stack-group {
+    display: flex; /* Faz os badges fluírem verticalmente */
+    flex-direction: column;
+    gap: 2px; /* Espaço entre os badges na pilha */
+}
+/* --- FIM DO NOVO ESTILO DE EMPILHAMENTO --- */
+
+
+.truck-code-badge {
+    display: inline-block;
+    color: white;
+    padding: 2px 4px; 
+    border-radius: 4px;
+    font-size: 0.7rem; 
+    font-weight: 600;
+    margin: 1px; 
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.truck-code-badge:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Cores dos badges */
+.legend-color-box.status-indo_carregar,
+.truck-code-badge.status-indo_carregar { background-color: #2B6CB0; }
+
+.legend-color-box.status-carregando,
+.truck-code-badge.status-carregando { background-color: #D69E2E; }
+
+.legend-color-box.status-retornando,
+.truck-code-badge.status-retornando { background-color: #805AD5; }
+
+.legend-color-box.status-patio_carregado,
+.truck-code-badge.status-patio_carregado { background-color: #D53F8C; }
+
+.legend-color-box.status-descarregando,
+.truck-code-badge.status-descarregando { background-color: #38A169; }
+
+.legend-color-box.status-patio_vazio,
+.truck-code-badge.status-patio_vazio { background-color: #A0AEC0; }
+
+.legend-color-box.status-disponivel,
+.truck-code-badge.status-disponivel { background-color: #718096; }
+
+.legend-color-box.status-quebrado,
+.truck-code-badge.status-quebrado { background-color: var(--accent-danger); }
+
+.legend-color-box.status-parado,
+.truck-code-badge.status-parado { background-color: #ED8936; }
+
+
+/* Destaque Hora Atual */
+.data-table-modern .mov-header-slot.current-hour-slot {
+    background-color: var(--accent-edit); 
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-primary);
+}
+.data-table-modern .mov-cell.current-hour-slot {
+    background-color: rgba(43, 108, 176, 0.15); 
+    border-left: 1px solid var(--accent-edit);
+    border-right: 1px solid var(--accent-edit);
+}
+
+
+/* Destaque Frente Inativa */
+.data-table-modern tbody tr.frente-inativa td {
+    border-bottom: 1px solid var(--accent-danger); 
+    background-color: rgba(197, 48, 48, 0.05); 
+}
+.data-table-modern tbody tr.frente-inativa .mov-frente-name {
+    border-left-color: var(--accent-danger);
+    background-color: rgba(197, 48, 48, 0.1);
+}
+.data-table-modern tbody tr.frente-inativa .frente-name-text {
+    color: var(--accent-danger);
+    opacity: 0.8;
+}
+.data-table-modern tbody tr.frente-inativa .frente-fazenda-text {
+    opacity: 0.7;
+}
+
+/* Tabela Descarga */
+.descarga-container-matriz {
+    padding: 0 24px 16px 24px; 
+    flex-shrink: 0; 
+    border-top: 1px solid var(--border-color); 
+    margin-top: 16px; 
+}
+
+.descarga-header-matriz {
+    font-size: 1.3rem; 
+    color: var(--accent-primary); 
+    margin-top: 16px; 
+    margin-bottom: 12px; 
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
