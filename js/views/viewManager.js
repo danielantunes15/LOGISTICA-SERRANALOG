@@ -13,6 +13,8 @@ import { OcorrenciasView } from './ocorrencias.js';
 import { TempoView } from './tempo.js'; 
 import { PatioCarregadoView } from './patioCarregado.js'; 
 import { GerenciamentoTerceirosView } from './gerenciamentoTerceiros.js';
+// NOVO: Importando o gerenciador dos novos módulos de Frota
+import { GestaoFrotaView } from './gestaoFrota.js';
 
 export class ViewManager {
     constructor(appManager) { 
@@ -34,7 +36,7 @@ export class ViewManager {
         this.views.set('dashboard', new DashboardView());
         this.views.set('boletim-diario', new BoletimDiarioView()); 
         this.views.set('controle', new ControleView());
-        this.views.set('frota', new FrotaView());
+        this.views.set('frota', new FrotaView()); // Mantido caso ainda use a view antiga
         this.views.set('equipamentos', new EquipamentosView()); 
         
         this.views.set('fazendas', new FazendasView()); 
@@ -54,6 +56,14 @@ export class ViewManager {
         this.views.set('cadastro-fornecedores', new CadastrosView('fornecedores'));
         this.views.set('cadastro-proprietarios', new CadastrosView('proprietarios'));
         this.views.set('cadastro-terceiros', new CadastrosView('terceiros'));
+
+        // NOVO: Registrando os novos submenus da Frota Própria
+        this.views.set('frota-dashboard', new GestaoFrotaView('dashboard'));
+        this.views.set('frota-abastecimento', new GestaoFrotaView('abastecimento'));
+        this.views.set('frota-pneus', new GestaoFrotaView('pneus'));
+        this.views.set('frota-manutencao', new GestaoFrotaView('manutencao'));
+        this.views.set('frota-telemetria', new GestaoFrotaView('telemetria'));
+        this.views.set('frota-motoristas', new GestaoFrotaView('motoristas'));
 
         console.log('Views registradas:', Array.from(this.views.keys()));
     }

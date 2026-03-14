@@ -85,6 +85,44 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
             </div>
         </div>
     `;
+
+    // Novo Menu Completo de Frota Própria (Tritrens)
+    const frotaGroup = `
+        <div class="nav-group" id="frota-group">
+            <button class="nav-button-group">
+                <i class="ph-fill ph-truck"></i>
+                <span>Frota Própria</span>
+                ${downtimeCaminhoes > 0 ? `<span class="badge alert" style="margin-left:auto; margin-right:10px;">${downtimeCaminhoes}</span>` : ''}
+                <i class="ph ph-caret-down caret"></i>
+            </button>
+            <div class="submenu">
+                <button class="nav-button" data-view="frota-dashboard">
+                    <i class="ph-fill ph-chart-pie-slice"></i>
+                    <span>Dashboard Frota</span>
+                </button>
+                <button class="nav-button" data-view="frota-abastecimento">
+                    <i class="ph-fill ph-gas-pump"></i>
+                    <span>Combustível e Médias</span>
+                </button>
+                <button class="nav-button" data-view="frota-pneus">
+                    <i class="ph-fill ph-circles-four"></i>
+                    <span>Gestão de Pneus</span>
+                </button>
+                <button class="nav-button" data-view="frota-manutencao">
+                    <i class="ph-fill ph-wrench"></i>
+                    <span>Manutenção (OS)</span>
+                </button>
+                <button class="nav-button" data-view="frota-telemetria">
+                    <i class="ph-fill ph-steering-wheel"></i>
+                    <span>Telemetria</span>
+                </button>
+                <button class="nav-button" data-view="frota-motoristas">
+                    <i class="ph-fill ph-identification-card"></i>
+                    <span>Motoristas</span>
+                </button>
+            </div>
+        </div>
+    `;
     
     // Bloco de Perfil minimalista no final
     const profileFooterBlock = `
@@ -134,11 +172,9 @@ export async function loadSidebar(userRole, userNameDisplay = 'Usuário', counts
                 <i class="ph-fill ph-arrows-clockwise"></i>
                 <span>Painel de Controle</span>
             </button>
-            <button class="nav-button" data-view="frota">
-                <i class="ph-fill ph-truck"></i>
-                <span>Gerenciamento de Frota</span>
-                ${downtimeCaminhoes > 0 ? `<span class="badge alert">${downtimeCaminhoes}</span>` : ''}
-            </button>
+            
+            ${frotaGroup}
+            
             <button class="nav-button" data-view="equipamentos">
                 <i class="ph-fill ph-tractor"></i>
                 <span>Equipamentos</span>
@@ -212,6 +248,17 @@ function addSidebarEventListeners() {
         if (navButtonGroupGerencial) {
             navButtonGroupGerencial.addEventListener('click', () => {
                 gerencialGroupEl.classList.toggle('open');
+            });
+        }
+    }
+
+    // Toggle para o submenu Frota Própria
+    const frotaGroupEl = document.getElementById('frota-group');
+    if (frotaGroupEl) {
+        const navButtonGroupFrota = frotaGroupEl.querySelector('.nav-button-group');
+        if (navButtonGroupFrota) {
+            navButtonGroupFrota.addEventListener('click', () => {
+                frotaGroupEl.classList.toggle('open');
             });
         }
     }
