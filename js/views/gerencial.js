@@ -187,7 +187,7 @@ export class GerencialView {
 
     showUserModal(user = null) {
         const isEdit = !!user;
-        // Se estiver editando, resgata os menus salvos. Se for novo, marca tudo por padrão ou deixa vazio (aqui deixei tudo marcado como padrão para novos)
+        // Se estiver editando, resgata os menus salvos. Se for novo, marca tudo por padrão
         const permissoesUser = user && user.menus_permitidos ? user.menus_permitidos : this.availableMenus.map(m => m.id);
         
         // Gerador de checkboxes para cada menu
@@ -321,16 +321,61 @@ export class GerencialView {
     }
 
     renderMetasTab() {
-        const rows = this.frentes.map(f => `<tr><td>${f.nome}</td><td><input type="number" class="form-input" id="meta-input-${f.id}" value="${f.frentes_metas?.[0]?.meta_toneladas || 0}"></td><td><button class="btn-primary btn-save-meta" data-frente-id="${f.id}">Salvar</button></td></tr>`).join('');
-        return `<div class="metas-tab"><table class="escala-table"><thead><tr><th>Frente</th><th>Meta (Ton)</th><th>Ação</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        const rows = this.frentes.map(f => {
+            // Verifica se o Supabase devolveu um Array (lista) ou um Objeto direto
+            let metaValue = 0;
+            if (f.frentes_metas) {
+                if (Array.isArray(f.frentes_metas)) {
+                    metaValue = f.frentes_metas[0]?.meta_toneladas || 0;
+                } else {
+                    metaValue = f.frentes_metas.meta_toneladas || 0;
+                }
+            }
+            
+            return `
+                <tr>
+                    <td>${f.nome}</td>
+                    <td><input type="number" class="form-input" id="meta-input-${f.id}" value="${metaValue}"></td>
+                    <td><button class="btn-primary btn-save-meta" data-frente-id="${f.id}">Salvar</button></td>
+                </tr>
+            `;
+        }).join('');
+        
+        return `
+            <div class="metas-tab">
+                <table class="escala-table">
+                    <thead>
+                        <tr>
+                            <th>Frente</th>
+                            <th>Meta (Ton)</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
     }
 
     async handleSaveMeta(id, val) { 
         try { 
+            showLoading(); // Mostra a tela de carregamento
+            
+            // 1. Salva a meta no banco de dados
             await saveFrenteMeta(id, parseFloat(val)); 
-            showToast('Meta salva!', 'success'); 
+            
+            // 2. Limpa o cache para que a tela puxe o novo valor do banco
+            dataCache.invalidateAllData();
+            
+            showToast('Meta salva com sucesso!', 'success'); 
+            
+            // 3. Recarrega a aba para confirmar visualmente que salvou
+            await this.loadTabContent();
+            
         } catch (e) { 
             handleOperation(e); 
-        } 
+        } finally {
+            hideLoading();
+        }
     }
 }
