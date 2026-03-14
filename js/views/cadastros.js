@@ -150,7 +150,8 @@ export class CadastrosView {
             terceiros: [
                 { name: 'nome', label: 'Nome do Motorista / Colaborador', type: 'text', required: true },
                 { name: 'cpf_cnpj', label: 'CPF', type: 'text', required: true, validation: 'cpfcnpj' }, 
-                { name: 'descricao_atividade', label: 'Cargo / Atividade', type: 'select', options: ['Motorista canavieiro', 'Operador de trator reboque', 'Operador de carregadeira', 'Operador de trator transbordo', 'Operador de colhedora', 'Fiscal de equipe', 'Motorista pipa'], required: true },
+                // MUDANÇA: As opções foram atualizadas exatamente conforme o seu pedido
+                { name: 'descricao_atividade', label: 'Cargo / Atividade', type: 'select', options: ['Motorista', 'Controlador de Trafego', 'Controlador de Portaria', 'Almoxarife'], required: true },
                 { name: 'empresa_id', label: 'Empresa / Vínculo', type: 'select', source: 'proprietarios', displayField: 'nome', required: true },
                 { name: 'situacao', label: 'Situação Operacional', type: 'select', options: ['ativo', 'inativo', 'excluído pelo parceiro'], required: true },
                 { name: 'status_homologacao', label: 'Status de Integração', type: 'select', options: ['Integrado (Apto)', 'Falta Integração', 'Bloqueado'], required: true },
