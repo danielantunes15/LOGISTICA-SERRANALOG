@@ -10,30 +10,32 @@ import {
     insertItem, 
     deleteItem, 
     updateItem,
-    saveFrenteMeta // <-- NOVA IMPORTAÇÃO
+    saveFrenteMeta 
 } from '../api.js';
 import { showToast, handleOperation, showLoading, hideLoading } from '../helpers.js';
 import { formatDateTime, getCurrentShift } from '../timeUtils.js';
 import { openModal, closeModal } from '../components/modal.js';
-import { dataCache } from '../dataCache.js'; // <-- NOVA IMPORTAÇÃO
+import { dataCache } from '../dataCache.js';
 
 export class GerencialView {
     constructor() {
         this.container = null;
-        this.activeTab = 'escala'; // Padrão agora é a escala
+        this.activeTab = 'escala';
         this.users = [];
-        // Estado para a aba de Escala
         this.funcionarios = [];
         this.escalaData = {}; 
         this.scheduleChanged = false;
+        
+        // NOVO: Adicionado 'Controlador de Tráfego' na lista de funções
         this.funcoes = [
             'Líder de Produção Agrícola',
             'Balanceiro',
             'Motorista de Pipa',
-            'Auxiliar de Serviços Gerais'
+            'Auxiliar de Serviços Gerais',
+            'Controlador de Tráfego'
         ];
-        // Estado para a aba de Metas
-        this.frentes = []; // <-- NOVO
+        
+        this.frentes = []; 
     }
 
     async show() {
@@ -84,11 +86,9 @@ export class GerencialView {
             });
         });
         
-        // Listener delegado para todo o conteúdo gerencial
         document.getElementById('gerencial-content').addEventListener('click', (e) => {
             const target = e.target;
 
-            // Ações da aba Usuários
             if (target.closest('#btn-add-user')) this.showRegisterUserModal();
             if (target.closest('.edit-user-btn')) {
                 const userId = parseInt(target.closest('.edit-user-btn').dataset.userId);
@@ -106,11 +106,9 @@ export class GerencialView {
                 this.showDeleteUserModal(userId, userName);
             }
 
-            // Ações da aba Escala
             if (target.closest('#btn-manage-funcionarios')) this.showManageFuncionariosModal();
             if (target.closest('#btn-save-escala')) this.handleSaveEscala();
 
-            // --- AÇÕES DA ABA METAS (NOVO) ---
             if (e.target.closest('.btn-save-meta')) {
                 const button = e.target.closest('.btn-save-meta');
                 const frenteId = button.dataset.frenteId;
@@ -131,7 +129,6 @@ export class GerencialView {
             if (this.activeTab === 'escala') {
                 await this.loadEscalaData();
                 contentContainer.innerHTML = this.renderEscalaTab();
-                // Adiciona listener de change após renderizar o calendário
                 const calendarContainer = this.container.querySelector('.escala-calendario-container');
                 if (calendarContainer) {
                     calendarContainer.addEventListener('change', (e) => {
@@ -149,7 +146,7 @@ export class GerencialView {
             } else if (this.activeTab === 'usuarios') {
                 await this.loadUserData(); 
                 contentContainer.innerHTML = this.renderUsersTab();
-            } else if (this.activeTab === 'metas') { // --- NOVA CONDIÇÃO ---
+            } else if (this.activeTab === 'metas') {
                 await this.loadMetasData();
                 contentContainer.innerHTML = this.renderMetasTab();
             }
@@ -161,9 +158,8 @@ export class GerencialView {
         }
     }
 
-    // --- MÉTODOS DA ABA DE ESCALA ---
+    // --- LÓGICA DE GERAÇÃO DE ESCALAS ---
 
-    // CORRIGIDO: Gera escala 6x2 rotativa para 366 dias e usa data UTC
     generate6x2Schedule(funcionarioId, startDateStr, initialTurno) {
         const schedule = [];
         const turnSequence = ['C', 'B', 'A'];
@@ -171,23 +167,16 @@ export class GerencialView {
         let workDayCounter = 0;
         let offDayCounter = 0;
 
-        // CORREÇÃO 1: Parse da data de início como UTC para evitar erros de fuso horário
         const [year, month, day] = startDateStr.split('-').map(Number);
         const startDateUTC = new Date(Date.UTC(year, month - 1, day));
 
-        // CORREÇÃO 2: Gera a escala para 366 dias (1 ano) em vez de 30
         for (let i = 0; i < 366; i++) { 
             const currentDate = new Date(startDateUTC);
-            // CORREÇÃO 3: Usa setUTCDate para incrementar o dia no fuso UTC
             currentDate.setUTCDate(currentDate.getUTCDate() + i); 
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
             if (workDayCounter < 6) {
-                schedule.push({
-                    funcionario_id: funcionarioId,
-                    data: currentDateStr,
-                    turno: currentTurn
-                });
+                schedule.push({ funcionario_id: funcionarioId, data: currentDateStr, turno: currentTurn });
                 workDayCounter++;
             } else {
                 offDayCounter++;
@@ -202,79 +191,128 @@ export class GerencialView {
         return schedule;
     }
     
-    /**
-     * CORRIGIDO: Gera escala 6x2 turno fixo para 366 dias e usa data UTC
-     */
     generate6x2FixedTurnSchedule(funcionarioId, startDateStr, fixedTurno) {
         const schedule = [];
         let workDayCounter = 0;
         let offDayCounter = 0;
-
-        // CORREÇÃO 1: Parse da data de início como UTC
         const [year, month, day] = startDateStr.split('-').map(Number);
         const startDateUTC = new Date(Date.UTC(year, month - 1, day));
 
-        // CORREÇÃO 2: Gera a escala para 366 dias
         for (let i = 0; i < 366; i++) {
             const currentDate = new Date(startDateUTC);
             currentDate.setUTCDate(currentDate.getUTCDate() + i);
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
             if (workDayCounter < 6) {
-                schedule.push({
-                    funcionario_id: funcionarioId,
-                    data: currentDateStr,
-                    turno: fixedTurno // Turno é sempre o inicial/fixo
-                });
+                schedule.push({ funcionario_id: funcionarioId, data: currentDateStr, turno: fixedTurno });
                 workDayCounter++;
             } else {
                 offDayCounter++;
                 if (offDayCounter === 2) {
                     workDayCounter = 0;
                     offDayCounter = 0;
-                    // Nenhuma lógica para mudar o turno aqui
                 }
             }
         }
         return schedule;
     }
 
-    /**
-     * CORRIGIDO: Gera escala 5x1 turno fixo para 366 dias e usa data UTC
-     */
     generate5x1FixedTurnSchedule(funcionarioId, startDateStr, fixedTurno) {
         const schedule = [];
         let workDayCounter = 0;
         let offDayCounter = 0;
-
-        // CORREÇÃO 1: Parse da data de início como UTC
         const [year, month, day] = startDateStr.split('-').map(Number);
         const startDateUTC = new Date(Date.UTC(year, month - 1, day));
 
-        // CORREÇÃO 2: Gera a escala para 366 dias
         for (let i = 0; i < 366; i++) {
             const currentDate = new Date(startDateUTC);
             currentDate.setUTCDate(currentDate.getUTCDate() + i);
             const currentDateStr = currentDate.toISOString().split('T')[0];
 
-            if (workDayCounter < 5) { // Trabalha 5 dias
-                schedule.push({
-                    funcionario_id: funcionarioId,
-                    data: currentDateStr,
-                    turno: fixedTurno // Turno é sempre o inicial/fixo
-                });
+            if (workDayCounter < 5) {
+                schedule.push({ funcionario_id: funcionarioId, data: currentDateStr, turno: fixedTurno });
                 workDayCounter++;
             } else {
                 offDayCounter++;
-                if (offDayCounter === 1) { // Folga 1 dia
+                if (offDayCounter === 1) {
                     workDayCounter = 0;
                     offDayCounter = 0;
-                    // Nenhuma lógica para mudar o turno aqui
                 }
             }
         }
         return schedule;
     }
+
+    // NOVO: Escala 12x36 (Dia ou Noite fixo - 1 dia sim, 1 dia não)
+    generate12x36Schedule(funcionarioId, startDateStr, turnoName) {
+        const schedule = [];
+        const [year, month, day] = startDateStr.split('-').map(Number);
+        const startDateUTC = new Date(Date.UTC(year, month - 1, day));
+
+        for (let i = 0; i < 366; i++) {
+            const currentDate = new Date(startDateUTC);
+            currentDate.setUTCDate(currentDate.getUTCDate() + i);
+            const currentDateStr = currentDate.toISOString().split('T')[0];
+
+            // Pula 1 dia (se i for par, trabalha. Se ímpar, folga)
+            schedule.push({
+                funcionario_id: funcionarioId,
+                data: currentDateStr,
+                turno: (i % 2 === 0) ? turnoName : 'Folga'
+            });
+        }
+        return schedule;
+    }
+
+    // NOVO: Escala Viradinha (2 Dia, 2 Noite, 2 Folga)
+    generateViradinhaSchedule(funcionarioId, startDateStr) {
+        const schedule = [];
+        const [year, month, day] = startDateStr.split('-').map(Number);
+        const startDateUTC = new Date(Date.UTC(year, month - 1, day));
+
+        for (let i = 0; i < 366; i++) {
+            const currentDate = new Date(startDateUTC);
+            currentDate.setUTCDate(currentDate.getUTCDate() + i);
+            const currentDateStr = currentDate.toISOString().split('T')[0];
+
+            const mod = i % 6; // Ciclo de 6 dias
+            let turno = 'Folga';
+            if (mod === 0 || mod === 1) turno = 'Dia';
+            else if (mod === 2 || mod === 3) turno = 'Noite';
+
+            schedule.push({
+                funcionario_id: funcionarioId,
+                data: currentDateStr,
+                turno: turno
+            });
+        }
+        return schedule;
+    }
+
+    // NOVO: Escala ADM (Segunda a Sexta)
+    generateADMSchedule(funcionarioId, startDateStr) {
+        const schedule = [];
+        const [year, month, day] = startDateStr.split('-').map(Number);
+        const startDateUTC = new Date(Date.UTC(year, month - 1, day));
+
+        for (let i = 0; i < 366; i++) {
+            const currentDate = new Date(startDateUTC);
+            currentDate.setUTCDate(currentDate.getUTCDate() + i);
+            const currentDateStr = currentDate.toISOString().split('T')[0];
+
+            const dayOfWeek = currentDate.getUTCDay(); // 0 = Domingo, 6 = Sábado
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+            schedule.push({
+                funcionario_id: funcionarioId,
+                data: currentDateStr,
+                turno: isWeekend ? 'Folga' : 'ADM'
+            });
+        }
+        return schedule;
+    }
+
+    // --- MÉTODOS DE RENDERIZAÇÃO E DADOS ---
 
     async loadEscalaData() {
         try {
@@ -380,13 +418,17 @@ export class GerencialView {
                         const dateStr = date.toISOString().split('T')[0];
                         const turno = this.escalaData[func.id]?.[dateStr] || 'Folga';
                         const selectId = `turno-${func.id}-${dateStr}`;
+                        // NOVO: Adicionado opções Dia, Noite e ADM
                         return `
                             <td>
                                 <select class="turno-select turno-${turno}" id="${selectId}" data-funcionario-id="${func.id}" data-date="${dateStr}">
                                     <option value="Folga" ${turno === 'Folga' ? 'selected' : ''}>Folga</option>
-                                    <option value="A" ${turno === 'A' ? 'selected' : ''}>Turno A</option>
-                                    <option value="B" ${turno === 'B' ? 'selected' : ''}>Turno B</option>
-                                    <option value="C" ${turno === 'C' ? 'selected' : ''}>Turno C</option>
+                                    <option value="A" ${turno === 'A' ? 'selected' : ''}>Turno A (8h)</option>
+                                    <option value="B" ${turno === 'B' ? 'selected' : ''}>Turno B (8h)</option>
+                                    <option value="C" ${turno === 'C' ? 'selected' : ''}>Turno C (8h)</option>
+                                    <option value="Dia" ${turno === 'Dia' ? 'selected' : ''}>Dia (12h)</option>
+                                    <option value="Noite" ${turno === 'Noite' ? 'selected' : ''}>Noite (12h)</option>
+                                    <option value="ADM" ${turno === 'ADM' ? 'selected' : ''}>ADM</option>
                                 </select>
                             </td>
                         `;
@@ -472,6 +514,8 @@ export class GerencialView {
                 </td>
             </tr>
         `).join('');
+        
+        // NOVO: Adicionado seletor de Tipo de Escala e ID ao grupo do turno inicial
         const modalContent = `
             <div class="gerenciar-funcionarios-modal">
                 <form id="form-add-funcionario" class="form-modern" style="margin-bottom: 24px;">
@@ -488,11 +532,24 @@ export class GerencialView {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="data-inicio-escala">Data de Início na Escala</label>
-                        <input type="date" id="data-inicio-escala" class="form-input" value="${todayString}" required>
+                        <label for="tipo-escala">Tipo de Escala (Novo)</label>
+                        <select id="tipo-escala" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="6x2_rotativo">6x2 Rotativo (Turnos A, B, C)</option>
+                            <option value="6x2_fixo">6x2 Fixo (Turno 8h)</option>
+                            <option value="5x1_fixo">5x1 Fixo (Turno 8h)</option>
+                            <option value="12x36_dia">12x36 (Somente Dia - 07h as 19h)</option>
+                            <option value="12x36_noite">12x36 (Somente Noite - 19h as 07h)</option>
+                            <option value="viradinha">Viradinha (2 Dia, 2 Noite, 2 Folga)</option>
+                            <option value="adm">Administrativo (Seg a Sex)</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="turno-inicial">Turno Inicial</label>
+                        <label for="data-inicio-escala">Data de Início (Primeiro dia da Escala)</label>
+                        <input type="date" id="data-inicio-escala" class="form-input" value="${todayString}" required>
+                    </div>
+                    <div class="form-group" id="turno-inicial-group">
+                        <label for="turno-inicial">Turno Inicial (Apenas para 6x2 e 5x1)</label>
                         <select id="turno-inicial" class="form-select" required>
                             <option value="">Selecione...</option>
                             <option value="A">Turno A</option>
@@ -500,7 +557,7 @@ export class GerencialView {
                             <option value="C">Turno C</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-primary">Adicionar</button>
+                    <button type="submit" class="btn-primary">Adicionar e Gerar Escala</button>
                 </form>
                 <h4>Funcionários Cadastrados</h4>
                 <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
@@ -521,12 +578,30 @@ export class GerencialView {
         `;
         openModal('Gerenciar Funcionários da Escala', modalContent);
 
+        // Esconde/Exige o "Turno Inicial" de acordo com o tipo de escala escolhido
+        document.getElementById('tipo-escala').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const turnoInicialGroup = document.getElementById('turno-inicial-group');
+            const turnoInicialInput = document.getElementById('turno-inicial');
+            
+            // Se for as novas escalas (12h, adm, etc), o turno inicial A/B/C não faz sentido
+            if (['12x36_dia', '12x36_noite', 'viradinha', 'adm'].includes(val)) {
+                turnoInicialGroup.style.display = 'none';
+                turnoInicialInput.removeAttribute('required');
+            } else {
+                turnoInicialGroup.style.display = 'block';
+                turnoInicialInput.setAttribute('required', 'required');
+            }
+        });
+
         document.getElementById('form-add-funcionario').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('nome-funcionario').value;
             const funcao = document.getElementById('funcao-funcionario').value;
+            const tipoEscala = document.getElementById('tipo-escala').value;
             const dataInicio = document.getElementById('data-inicio-escala').value;
             const turnoInicial = document.getElementById('turno-inicial').value;
+            
             showLoading();
             try {
                 const { data: novoFuncionario, error: insertError } = await insertItem('escala_funcionarios', { nome, funcao });
@@ -535,18 +610,37 @@ export class GerencialView {
                 let escalaGerada;
                 let successMessage;
 
-                if (funcao === 'Motorista de Pipa') {
-                     // Ciclo 6x2 com Turno Fixo
-                     escalaGerada = this.generate6x2FixedTurnSchedule(novoFuncionario.id, dataInicio, turnoInicial);
-                     successMessage = 'Funcionário adicionado e escala 6x2 (Turno Fixo) gerada!';
-                } else if (funcao === 'Auxiliar de Serviços Gerais') {
-                     // Ciclo 5x1 com Turno Fixo (NOVO)
-                     escalaGerada = this.generate5x1FixedTurnSchedule(novoFuncionario.id, dataInicio, turnoInicial);
-                     successMessage = 'Funcionário adicionado e escala 5x1 (Turno Fixo) gerada!';
-                } else {
-                     // Padrão: Ciclo 6x2 com Turno Rotativo (para Líder e Balanceiro)
-                     escalaGerada = this.generate6x2Schedule(novoFuncionario.id, dataInicio, turnoInicial);
-                     successMessage = 'Funcionário adicionado e escala 6x2 (Turno Rotativo) gerada!';
+                // NOVO: Geração dinâmica de escala baseada na seleção do usuário
+                switch(tipoEscala) {
+                    case '12x36_dia':
+                        escalaGerada = this.generate12x36Schedule(novoFuncionario.id, dataInicio, 'Dia');
+                        successMessage = 'Funcionário adicionado e escala 12x36 (Somente Dia) gerada!';
+                        break;
+                    case '12x36_noite':
+                        escalaGerada = this.generate12x36Schedule(novoFuncionario.id, dataInicio, 'Noite');
+                        successMessage = 'Funcionário adicionado e escala 12x36 (Somente Noite) gerada!';
+                        break;
+                    case 'viradinha':
+                        escalaGerada = this.generateViradinhaSchedule(novoFuncionario.id, dataInicio);
+                        successMessage = 'Funcionário adicionado e escala Viradinha gerada!';
+                        break;
+                    case 'adm':
+                        escalaGerada = this.generateADMSchedule(novoFuncionario.id, dataInicio);
+                        successMessage = 'Funcionário adicionado e escala ADM gerada!';
+                        break;
+                    case '6x2_fixo':
+                        escalaGerada = this.generate6x2FixedTurnSchedule(novoFuncionario.id, dataInicio, turnoInicial);
+                        successMessage = 'Funcionário adicionado e escala 6x2 (Turno Fixo) gerada!';
+                        break;
+                    case '5x1_fixo':
+                        escalaGerada = this.generate5x1FixedTurnSchedule(novoFuncionario.id, dataInicio, turnoInicial);
+                        successMessage = 'Funcionário adicionado e escala 5x1 (Turno Fixo) gerada!';
+                        break;
+                    case '6x2_rotativo':
+                    default:
+                        escalaGerada = this.generate6x2Schedule(novoFuncionario.id, dataInicio, turnoInicial);
+                        successMessage = 'Funcionário adicionado e escala 6x2 (Turno Rotativo) gerada!';
+                        break;
                 }
                 
                 await saveEscalaTurnos(escalaGerada);
@@ -633,7 +727,7 @@ export class GerencialView {
         });
     }
 
-    // --- MÉTODOS DA ABA DE USUÁRIOS ---
+    // --- MÉTODOS DA ABA DE USUÁRIOS (MANTIDOS INTACTOS) ---
     async loadUserData() {
         try {
             this.users = await fetchAppUsers();
@@ -878,13 +972,10 @@ export class GerencialView {
         }
     }
     
-    // --- NOVOS MÉTODOS DA ABA DE METAS ---
-    
+    // --- MÉTODOS DA ABA DE METAS (MANTIDOS INTACTOS) ---
     async loadMetasData() {
         try {
-            // Busca frentes com suas metas associadas
-            const masterData = await dataCache.fetchMasterDataOnly(true); // Força refresh
-            // Filtra apenas frentes "reais" (remove "Nenhuma", "Disponível", etc.)
+            const masterData = await dataCache.fetchMasterDataOnly(true); 
             this.frentes = (masterData.frentes_servico || [])
                 .filter(f => f.nome.toLowerCase() !== 'nenhuma' && f.nome.toLowerCase() !== 'disponível')
                 .sort((a, b) => a.nome.localeCompare(b.nome));
@@ -900,8 +991,6 @@ export class GerencialView {
         }
 
         const rowsHTML = this.frentes.map(frente => {
-            // A meta vem de frentes_metas(meta_toneladas)
-            // O Supabase retorna isso como um array, pegamos o primeiro (ou único)
             const metaInfo = Array.isArray(frente.frentes_metas) ? frente.frentes_metas[0] : frente.frentes_metas; 
             const metaValue = metaInfo ? metaInfo.meta_toneladas : 0;
             
@@ -964,19 +1053,16 @@ export class GerencialView {
             return;
         }
 
-        // Feedback visual no botão
         const originalText = buttonElement.innerHTML;
         buttonElement.innerHTML = `<i class="ph-fill ph-circle-notch ph-spin"></i> Salvando...`;
         buttonElement.disabled = true;
 
         try {
             await saveFrenteMeta(frenteId, meta);
-            dataCache.invalidateAllData(); // Invalida o cache
+            dataCache.invalidateAllData(); 
             
-            // Atualiza this.frentes localmente para refletir a mudança
             const frente = this.frentes.find(f => f.id === frenteId);
             if (frente) {
-                // Lógica ajustada para lidar com array ou objeto
                 if (Array.isArray(frente.frentes_metas) && frente.frentes_metas.length > 0) {
                     frente.frentes_metas[0].meta_toneladas = meta;
                 } else if (frente.frentes_metas && !Array.isArray(frente.frentes_metas)) {
@@ -985,13 +1071,10 @@ export class GerencialView {
                     frente.frentes_metas = [{ meta_toneladas: meta }];
                 }
             }
-            
             showToast(`Meta para "${frente?.nome || 'Frente'}" salva com sucesso!`, 'success');
-            
         } catch (error) {
             handleOperation(error);
         } finally {
-            // Restaura o botão
             buttonElement.innerHTML = originalText;
             buttonElement.disabled = false;
         }

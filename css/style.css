@@ -848,3 +848,27 @@ body {
 }
 
 /* --- FIM NOVOS ESTILOS --- */
+
+/* Cores para os novos Turnos */
+.turno-dia {
+    background-color: #FEFCBF; /* Amarelinho claro */
+    color: #B7791F;
+    font-weight: 600;
+}
+
+.turno-noite {
+    background-color: #EBF4FF; /* Azulzinho noturno */
+    color: #2B6CB0;
+    font-weight: 600;
+}
+
+.turno-adm {
+    background-color: #E9D8FD; /* Roxinho corporativo */
+    color: #6B46C1;
+    font-weight: 600;
+}
+
+/* Ajuste para as caixas de seleção na tabela ficarem coloridas também */
+select.turno-Dia { background-color: #FEFCBF; color: #B7791F; }
+select.turno-Noite { background-color: #EBF4FF; color: #2B6CB0; }
+select.turno-ADM { background-color: #E9D8FD; color: #6B46C1; }

@@ -14,41 +14,32 @@ export class DashboardView {
     constructor() {
         this.container = null;
         this.data = {};
-        this.autoRefreshInterval = null; // MANTIDO: Mas não mais usado para polling
-        // MUDANÇA: Estado de filtragem da legenda (inicia tudo ativo)
+        this.autoRefreshInterval = null; 
         this.activeFilters = {
             usina: true,
             ativa: true,
             fazendo_cata: true,
             inativa: true,
-            ocorrencia: true // NOVO: Filtro para ocorrências
+            ocorrencia: true 
         };
-        this._boundStatusUpdateHandler = this.handleStatusUpdate.bind(this); // Para o listener
+        this._boundStatusUpdateHandler = this.handleStatusUpdate.bind(this);
     }
 
     async show() {
         await this.loadHTML();
         await this.initializeMap();
         await this.loadData();
-        // REMOVIDO: this.startAutoRefresh();
         this.addEventListeners();
-
-        // NOVO: Adiciona o listener de Real-Time
         window.addEventListener('statusUpdated', this._boundStatusUpdateHandler);
     }
 
     async hide() {
-        // REMOVIDO: this.stopAutoRefresh();
-        // NOVO: Remove o listener ao sair da view
         window.removeEventListener('statusUpdated', this._boundStatusUpdateHandler);
     }
 
-    // NOVO: Handler para o evento global
     handleStatusUpdate(e) {
-        // Verifica se a atualização é relevante para o Dashboard antes de recarregar
         const tables = ['caminhoes', 'frentes_servico', 'ocorrencias'];
         if (tables.includes(e.detail.table)) {
-             // Força o refresh para buscar a nova versão que invalidou o cache
              this.loadData(true);
         }
     }
@@ -60,7 +51,6 @@ export class DashboardView {
     }
 
     mockFrenteCycleTime(frenteId) {
-        // Mock data: 3h 45m, 4h 10m, or 5h 05m based on frenteId
         if (frenteId % 3 === 0) return '03h 45m';
         if (frenteId % 3 === 1) return '04h 10m';
         return '05h 05m';
@@ -85,8 +75,8 @@ export class DashboardView {
                             <div class="panel-header">
                                 <h3>Status das Operações</h3>
                                 <div class="on-shift-info">
-                                    <div id="on-shift-leaders"></div>
-                                    <div id="on-shift-weighers"></div>
+                                    <div id="on-shift-drivers"></div>
+                                    <div id="on-shift-controllers"></div>
                                 </div>
                                 <div class="last-update" id="last-update">
                                     Atualizado agora
@@ -249,21 +239,19 @@ export class DashboardView {
 
     async initializeMap() {
         return new Promise(resolve => {
-            // Usa um pequeno delay para garantir que o DOM esteja renderizado antes de inicializar o Leaflet
             setTimeout(() => {
                 const map = mapManager.initDashboardMap();
                 if (map) {
                     console.log('Mapa principal inicializado com sucesso');
                     mapManager.invalidateSize('dashboard-map');
                 }
-                resolve(); // Resolve a Promise para que loadData() possa ser chamada
+                resolve();
             }, 100);
         });
     }
 
     async loadData(forceRefresh = false) {
         try {
-            // CORRIGIDO: Usa a função otimizada com CACHE para o Dashboard
             this.data = await dataCache.fetchMetadata(forceRefresh);
             this.updateDashboardStats();
             this.updateMap();
@@ -275,7 +263,6 @@ export class DashboardView {
         }
     }
 
-    // MUDANÇA: Lógica de contagem e cálculo do Raio Médio
     updateDashboardStats() {
         const { caminhoes, frentes_servico, equipamentos, fazendas } = this.data;
 
@@ -283,70 +270,35 @@ export class DashboardView {
         const readyStatuses = ['disponivel', 'patio_vazio'];
         const criticalStatuses = ['quebrado', 'parado'];
 
-        // 1. Estatísticas de Caminhões
         const totalCaminhoes = caminhoes ? caminhoes.length : 0;
-        const caminhoesEmOperacao = caminhoes ? caminhoes.filter(c =>
-            operationalStatuses.includes(c.status)
-        ).length : 0;
-        const caminhoesProntos = caminhoes ? caminhoes.filter(c =>
-            readyStatuses.includes(c.status)
-        ).length : 0;
-        const caminhoesCriticos = caminhoes ? caminhoes.filter(c =>
-            criticalStatuses.includes(c.status)
-        ).length : 0;
+        const caminhoesEmOperacao = caminhoes ? caminhoes.filter(c => operationalStatuses.includes(c.status)).length : 0;
+        const caminhoesProntos = caminhoes ? caminhoes.filter(c => readyStatuses.includes(c.status)).length : 0;
+        const caminhoesCriticos = caminhoes ? caminhoes.filter(c => criticalStatuses.includes(c.status)).length : 0;
 
-        // 2. Estatísticas de Frentes
         const totalFrentes = frentes_servico ? frentes_servico.length : 0;
         const frentesAtivas = frentes_servico ? frentes_servico.filter(f => f.status === 'ativa').length : 0;
         const frentesCata = frentes_servico ? frentes_servico.filter(f => f.status === 'fazendo_cata').length : 0;
         const frentesInativas = frentes_servico ? frentes_servico.filter(f => f.status === 'inativa' || !f.status).length : 0;
 
-        // 3. Estatísticas de Equipamentos
         const totalEquipamentos = equipamentos ? equipamentos.length : 0;
-        const equipamentosEmOperacao = equipamentos ? equipamentos.filter(e =>
-            e.status === 'ativo' && e.frente_id // Ativo E associado a uma frente
-        ).length : 0;
-        const equipamentosDisponiveis = equipamentos ? equipamentos.filter(e =>
-            e.status === 'ativo' && !e.frente_id // Ativo E sem frente (livre)
-        ).length : 0;
-        const equipamentosCriticos = equipamentos ? equipamentos.filter(e =>
-            criticalStatuses.includes(e.status) // Parado ou Quebrado
-        ).length : 0;
+        const equipamentosEmOperacao = equipamentos ? equipamentos.filter(e => e.status === 'ativo' && e.frente_id).length : 0;
+        const equipamentosDisponiveis = equipamentos ? equipamentos.filter(e => e.status === 'ativo' && !e.frente_id).length : 0;
+        const equipamentosCriticos = equipamentos ? equipamentos.filter(e => criticalStatuses.includes(e.status)).length : 0;
 
-        // 4. Estatísticas de Fazendas (Raio Médio)
         const totalFazendas = fazendas ? fazendas.length : 0;
-
-        const fazendasAtivasIds = new Set(
-            frentes_servico.filter(f => f.fazenda_id && f.status === 'ativa')
-                            .map(f => f.fazenda_id)
-        );
-
+        const fazendasAtivasIds = new Set(frentes_servico.filter(f => f.fazenda_id && f.status === 'ativa').map(f => f.fazenda_id));
         const fazendasColhendo = fazendasAtivasIds.size;
+        const fazendasDisponiveis = frentes_servico ? frentes_servico.filter(f => f.fazenda_id && f.status === 'inativa').length : 0;
 
-        // --- ALTERAÇÃO PRINCIPAL ---
-        // Uma fazenda é considerada "disponível" se estiver associada a uma frente INATIVA.
-        const fazendasDisponiveis = frentes_servico ? frentes_servico.filter(f =>
-            f.fazenda_id && f.status === 'inativa'
-        ).length : 0;
-        // --- FIM DA ALTERAÇÃO ---
-
-
-        // --- CÁLCULO DO RAIO MÉDIO (NOVO) ---
         let totalDistance = 0;
         let countHarvestingFazendas = 0;
 
         fazendas.forEach(f => {
-            // Verifica se a fazenda está ativamente colhendo (status 'ativa')
             if (fazendasAtivasIds.has(f.id) && f.latitude && f.longitude) {
                 const lat = parseFloat(f.latitude);
                 const lon = parseFloat(f.longitude);
-
-                // Garante que as coordenadas sejam válidas
                 if (!isNaN(lat) && !isNaN(lon)) {
-                    const distance = calculateDistance(
-                        USINA_COORDS[0], USINA_COORDS[1],
-                        lat, lon
-                    );
+                    const distance = calculateDistance(USINA_COORDS[0], USINA_COORDS[1], lat, lon);
                     totalDistance += distance;
                     countHarvestingFazendas++;
                 }
@@ -354,57 +306,41 @@ export class DashboardView {
         });
 
         const averageRadius = countHarvestingFazendas > 0 ? (totalDistance / countHarvestingFazendas).toFixed(1) : '--';
-        // ------------------------------------
 
-        // --- ATUALIZAÇÃO DOS ELEMENTOS ---
-
-        // Caminhões
         this.updateStatElement('caminhoes-em-operacao', caminhoesEmOperacao);
         this.updateStatElement('caminhoes-prontos', caminhoesProntos);
         this.updateStatElement('caminhoes-criticos', caminhoesCriticos);
         this.updateStatElement('caminhoes-total', totalCaminhoes);
 
-        // Frentes
         this.updateStatElement('frentes-ativas', frentesAtivas);
         this.updateStatElement('frentes-cata', frentesCata);
         this.updateStatElement('frentes-inativas', frentesInativas);
         this.updateStatElement('frentes-total', totalFrentes);
 
-        // Equipamentos
         this.updateStatElement('equipamentos-em-operacao', equipamentosEmOperacao);
         this.updateStatElement('equipamentos-disponiveis', equipamentosDisponiveis);
         this.updateStatElement('equipamentos-criticos', equipamentosCriticos);
         this.updateStatElement('equipamentos-total', totalEquipamentos);
 
-        // Fazendas
         this.updateStatElement('fazendas-colhendo', fazendasColhendo);
-        // MUDANÇA: Atualiza o KPI de Raio Médio
         this.updateStatElement('raio-medio-km', averageRadius);
         this.updateStatElement('fazendas-disponiveis', fazendasDisponiveis);
         this.updateStatElement('fazendas-total', totalFazendas);
 
-        // --- CÁLCULOS GERAIS (Eficiência Geral) ---
-
-        // Numerador: Soma dos recursos e frentes que estão em atividade/operação
         const totalActive = caminhoesEmOperacao + equipamentosEmOperacao + frentesAtivas + frentesCata;
-
-        // Denominador: Soma dos recursos totais (Caminhões e Equipamentos) mais o total de Frentes de Serviço
         const totalOverallResources = totalCaminhoes + totalEquipamentos + totalFrentes;
-
-        // NOVO CÁLCULO DE EFICIÊNCIA GERAL
         const eficiencia = totalOverallResources > 0 ? Math.round((totalActive / totalOverallResources) * 100) : 0;
 
         this.updateStatElement('eficiencia-geral', `${eficiencia}%`);
         this.updateEfficiencyBar(eficiencia);
-
-        const operacoesAtivas = totalActive;
-        this.updateStatElement('operacoes-ativas', operacoesAtivas);
+        this.updateStatElement('operacoes-ativas', totalActive);
     }
 
     async updateOnShiftStaff() {
-        const leadersEl = document.getElementById('on-shift-leaders');
-        const weighersEl = document.getElementById('on-shift-weighers');
-        if (!leadersEl || !weighersEl) return;
+        // NOVOS IDs CAPTURADOS DO HTML
+        const driversEl = document.getElementById('on-shift-drivers');
+        const controllersEl = document.getElementById('on-shift-controllers');
+        if (!driversEl || !controllersEl) return;
 
         try {
             const todayStr = new Date().toISOString().split('T')[0];
@@ -420,32 +356,32 @@ export class DashboardView {
                 turnosMap.set(t.funcionario_id, t.turno);
             });
 
-            // Filtra os funcionários que estão no turno atual e separa por função
-            const onShiftLeaders = funcionarios.filter(f =>
-                f.funcao === 'Líder de Produção Agrícola' &&
+            // 1. Conta quantos Motoristas estão no turno atual (Verifica se 'motorista' faz parte do cargo)
+            const activeDriversCount = funcionarios.filter(f =>
+                f.funcao && f.funcao.toLowerCase().includes('motorista') &&
+                turnosMap.get(f.id) === currentShiftInfo.turno
+            ).length;
+
+            // 2. Filtra os nomes dos Controladores de Tráfego no turno atual
+            const onShiftControllers = funcionarios.filter(f =>
+                f.funcao && (f.funcao.toLowerCase().includes('controlador') || f.funcao.toLowerCase().includes('trafego') || f.funcao.toLowerCase().includes('tráfego')) &&
                 turnosMap.get(f.id) === currentShiftInfo.turno
             ).map(f => f.nome).join(', ');
 
-            const onShiftWeighers = funcionarios.filter(f =>
-                f.funcao === 'Balanceiro' &&
-                turnosMap.get(f.id) === currentShiftInfo.turno
-            ).map(f => f.nome).join(', ');
-
-            // Atualiza o HTML
-            leadersEl.innerHTML = `Líder(es) de Turno: <span>${onShiftLeaders || 'N/D'}</span>`;
-            weighersEl.innerHTML = `Balanceiro(s): <span>${onShiftWeighers || 'N/D'}</span>`;
+            // Atualiza o HTML com visual moderno
+            driversEl.innerHTML = `Motoristas Ativos: <span style="font-weight: 600; color: var(--accent-primary);">${activeDriversCount} na escala</span>`;
+            controllersEl.innerHTML = `Controlador de Tráfego: <span style="font-weight: 600;">${onShiftControllers || 'Nenhum escalado'}</span>`;
 
         } catch (error) {
             console.error('Erro ao buscar equipe do turno:', error);
-            leadersEl.innerHTML = `Líder(es) de Turno: <span>Erro</span>`;
-            weighersEl.innerHTML = `Balanceiro(s): <span>Erro</span>`;
+            driversEl.innerHTML = `Motoristas Ativos: <span>Erro</span>`;
+            controllersEl.innerHTML = `Controlador de Tráfego: <span>Erro</span>`;
         }
     }
 
     updateStatElement(elementId, value) {
         const element = document.getElementById(elementId);
         if (element) {
-            // MUDANÇA: Evita animação para Raio Médio (strings)
             if (typeof value === 'number' && !isNaN(value)) {
                 this.animateCount(element, parseInt(element.textContent) || 0, value);
             } else {
@@ -461,19 +397,13 @@ export class DashboardView {
         function update(currentTime) {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-
             const easeOut = 1 - Math.pow(1 - progress, 3);
             const currentValue = Math.floor(start + (end - start) * easeOut);
-
             element.textContent = currentValue;
 
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            } else {
-                element.textContent = end;
-            }
+            if (progress < 1) requestAnimationFrame(update);
+            else element.textContent = end;
         }
-
         requestAnimationFrame(update);
     }
 
@@ -481,14 +411,9 @@ export class DashboardView {
         const bar = document.getElementById('eficiencia-bar');
         if (bar) {
             bar.style.width = `${percentage}%`;
-
-            if (percentage >= 80) {
-                bar.style.background = 'linear-gradient(90deg, #38A169, #2F855A)';
-            } else if (percentage >= 60) {
-                bar.style.background = 'linear-gradient(90deg, #D69E2E, #B7791F)';
-            } else {
-                bar.style.background = 'linear-gradient(90deg, #E53E3E, #C53030)';
-            }
+            if (percentage >= 80) bar.style.background = 'linear-gradient(90deg, #38A169, #2F855A)';
+            else if (percentage >= 60) bar.style.background = 'linear-gradient(90deg, #D69E2E, #B7791F)';
+            else bar.style.background = 'linear-gradient(90deg, #E53E3E, #C53030)';
         }
     }
 
@@ -503,33 +428,20 @@ export class DashboardView {
     updateMap() {
         const { fazendas, frentes_servico, caminhoes, equipamentos } = this.data;
         if (!fazendas || fazendas.length === 0) {
-             // Se não há fazendas no BD, centraliza na usina com zoom distante.
             mapManager.maps.get('dashboard-map')?.setView(USINA_COORDS, 10);
-            // Garante que a camada vazia seja processada para remover quaisquer marcadores antigos.
             mapManager.updateFazendaMarkersWithStatus([], this.activeFilters);
-            this.updateOcorrenciaMarkers(); // Limpa ocorrências
+            this.updateOcorrenciaMarkers();
             return;
         }
 
-        // --- Agregação de Dados Dinâmicos por Fazenda ---
         const fazendaDataMap = new Map();
         const cycleStatuses = CAMINHAO_ROUTE_STATUS;
-
-        // 1. Mapear Frentes e seus status
         const frenteMap = new Map(frentes_servico.map(f => [f.id, f]));
 
-        // 2. Agregação inicial
         fazendas.forEach(f => {
-             fazendaDataMap.set(f.id, {
-                ...f,
-                frenteStatus: null,
-                trucksInRoute: 0,
-                activeEquipment: 0,
-                frenteNome: 'N/A'
-             });
+             fazendaDataMap.set(f.id, { ...f, frenteStatus: null, trucksInRoute: 0, activeEquipment: 0, frenteNome: 'N/A' });
         });
 
-        // 3. Contar Caminhões e Equipamentos Ativos por Frente/Fazenda
         caminhoes.forEach(c => {
             if (c.frente_id && cycleStatuses.includes(c.status)) {
                 const frente = frenteMap.get(c.frente_id);
@@ -548,69 +460,46 @@ export class DashboardView {
             }
         });
 
-        // 4. Mapear Status Ativo da Frente para a Fazenda e ADICIONAR TEMPO DE CICLO
         frentes_servico.filter(f => f.fazenda_id && (f.status === 'ativa' || f.status === 'fazendo_cata' || f.status === 'inativa'))
                        .forEach(frente => {
                            if (fazendaDataMap.has(frente.fazenda_id)) {
                                const data = fazendaDataMap.get(frente.fazenda_id);
-                               data.frenteStatus = frente.status; // Ativa, Cata, Inativa
-                               data.frenteNome = frente.nome || 'N/A'; // CORREÇÃO AQUI: Garante que não é undefined
+                               data.frenteStatus = frente.status;
+                               data.frenteNome = frente.nome || 'N/A';
                                data.frente_id = frente.id;
-                               // MUDANÇA: Adiciona Tempo de Ciclo (Mock)
                                data.cycleTime = this.mockFrenteCycleTime(frente.id);
                            }
                        });
 
-        // 5. Filtrar apenas as fazendas que DEVEM aparecer no mapa (com frente associada)
         const fazendasNoMapa = Array.from(fazendaDataMap.values()).filter(f => f.frenteStatus !== null);
 
-        // --- FIM NOVO: Agregação de Dados Dinâmicos por Fazenda ---
-
-        // 1. ATUALIZA OS MARCADORES DE FAZENDA
         mapManager.updateFazendaMarkersWithStatus(fazendasNoMapa, this.activeFilters);
-
-        // NOVO: ATUALIZA OS MARCADORES DE OCORRÊNCIAS
         this.updateOcorrenciaMarkers();
 
-
-        // 2. AJUSTA O MAPA
-        // MUDANÇA: O ajuste do mapa deve considerar as ocorrências APENAS se o filtro estiver ativo.
         if (fazendasNoMapa.length > 0 || this.activeFilters.ocorrencia) {
             this.adjustMapToShowFazendas(fazendasNoMapa);
         } else {
-            // Apenas centraliza se a lista estiver vazia. O passo 1 já limpou.
             mapManager.maps.get('dashboard-map')?.setView(USINA_COORDS, 10);
             this.updateLastUpdateTime();
         }
     }
 
-    // NOVO: Função para desenhar marcadores de ocorrência
     async updateOcorrenciaMarkers() {
-        // Usa o fetchAllData para garantir o histórico de logs e a tabela de ocorrências
         const fullData = await dataCache.fetchAllData();
         const ocorrencias = fullData.ocorrencias || [];
         const map = mapManager.maps.get('dashboard-map');
 
         if (!map) return;
-
-        // Limpa marcadores de ocorrência antigos (se houver)
         mapManager.clearMarkers('dashboard-ocorrencias');
 
-        // FILTRO: Se o filtro de ocorrência estiver desativado, não desenha nada
-        if (!this.activeFilters.ocorrencia) {
-            return;
-        }
-
+        if (!this.activeFilters.ocorrencia) return;
 
         ocorrencias.forEach(ocorrencia => {
-            // Apenas mostra ocorrências em aberto (status 'aberto')
             if (ocorrencia.status === 'aberto' && ocorrencia.latitude && ocorrencia.longitude) {
                 const coords = [parseFloat(ocorrencia.latitude), parseFloat(ocorrencia.longitude)];
 
-                // Cria ícone de triângulo amarelo (reutilizando classes)
                 const ocorrenciaIcon = L.divIcon({
                     className: 'ocorrencia-marker',
-                    // REMOÇÃO DO TRIÂNGULO e ÍCONE SIRENE AJUSTADO
                     html: `
                         <div class="marker-pin" style="background-color: #ED8936; border-radius: 50%; width: 40px; height: 40px; margin: 0; display: flex; align-items: center; justify-content: center;">
                             <i class="ph-fill ph-siren" style="font-size: 24px; color: black; transform: rotate(0deg);"></i>
@@ -635,7 +524,6 @@ export class DashboardView {
                             <p><strong>Frentes Impactadas:</strong> <span class="value">${(ocorrencia.frentes_impactadas || []).length}</span></p>
                             <p><strong>Registro:</strong> <span class="value">${new Date(ocorrencia.created_at).toLocaleDateString('pt-BR')}</span></p>
                         </div>
-
                         <div class="popup-actions">
                             <button class="btn-primary btn-action-map" data-action="goToOcorrencias" data-ocorrencia-id="${ocorrencia.id}" title="Gerenciar Ocorrência">
                                 <i class="ph-fill ph-siren"></i> Gerenciar Ocorrência
@@ -647,39 +535,25 @@ export class DashboardView {
                 marker.bindPopup(popupContent);
                 marker.addTo(map);
 
-                // NOVO: Adiciona o listener de clique no pop-up para navegar
                 marker.on('popupopen', () => {
-                     // CORREÇÃO: Altera o seletor para buscar a o botão pelo atributo data-action,
-                     // pois a classe '.ocorrencia-marker' não está no container do popup.
                      const btn = document.querySelector('[data-action="goToOcorrencias"]');
-
                      if (btn) {
                          btn.addEventListener('click', () => {
-                             // Dispara o evento de troca de view
-                             window.dispatchEvent(new CustomEvent('viewChanged', {
-                                 detail: {
-                                     view: 'ocorrencias'
-                                 }
-                             }));
+                             window.dispatchEvent(new CustomEvent('viewChanged', { detail: { view: 'ocorrencias' } }));
                          });
                      }
                  });
 
-
-                if (!mapManager.markers.has('dashboard-ocorrencias')) {
-                    mapManager.markers.set('dashboard-ocorrencias', []);
-                }
+                if (!mapManager.markers.has('dashboard-ocorrencias')) mapManager.markers.set('dashboard-ocorrencias', []);
                 mapManager.markers.get('dashboard-ocorrencias').push(marker);
             }
         });
     }
 
-    // Função auxiliar para formatação (reutilizada de cadastros.js)
     formatOption(option) {
         if (!option || typeof option !== 'string') return 'N/A';
         return option.charAt(0).toUpperCase() + option.slice(1).replace('_', ' ');
     }
-
 
     adjustMapToShowFazendas(fazendas) {
         const map = mapManager.maps.get('dashboard-map');
@@ -687,38 +561,28 @@ export class DashboardView {
 
         const bounds = this.calculateBounds(fazendas);
 
-        // MUDANÇA: Adiciona ocorrências ativas APENAS se o filtro estiver ativo
         if (this.activeFilters.ocorrencia) {
             const ocorrenciasMarkers = mapManager.markers.get('dashboard-ocorrencias') || [];
-            ocorrenciasMarkers.forEach(marker => {
-                 bounds.extend(marker.getLatLng());
-            });
+            ocorrenciasMarkers.forEach(marker => bounds.extend(marker.getLatLng()));
         }
 
-
         if (bounds.isValid()) {
-            // MUDANÇA: Ajuste de Zoom para 14
             map.fitBounds(bounds, {
-                paddingTopLeft: [50, 200], // 50px de cima, 200px da esquerda
+                paddingTopLeft: [50, 200],
                 paddingBottomRight: [50, 50],
-                maxZoom: 14 // MUDANÇA AQUI: Visão mais detalhada (Zoom mais próximo)
+                maxZoom: 14 
             });
         }
     }
 
     calculateBounds(fazendas) {
         const bounds = L.latLngBounds();
-
-        // 1. Incluir Coordenadas da Usina SEMPRE
         bounds.extend(USINA_COORDS);
-
-        // 2. Incluir todas as fazendas ativas
         fazendas.forEach(fazenda => {
             if (fazenda.latitude && fazenda.longitude) {
                 bounds.extend([parseFloat(fazenda.latitude), parseFloat(fazenda.longitude)]);
             }
         });
-
         return bounds;
     }
 
@@ -726,13 +590,11 @@ export class DashboardView {
         const refreshBtn = document.getElementById('refresh-operations');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => {
-                // Força o refresh para ignorar o cache de 10s.
                 this.loadData(true);
                 showToast('Operações atualizadas', 'success');
             });
         }
 
-        // MUDANÇA: Lógica de Filtragem da Legenda
         const legend = document.getElementById('map-legend');
         if (legend) {
             legend.addEventListener('click', (e) => {
@@ -740,12 +602,10 @@ export class DashboardView {
                 const filterKey = item?.dataset.filterKey;
 
                 if (filterKey) {
-                    // A usina não é filtrada por esta lógica, mas as fazendas sim
                     if (filterKey === 'usina') return;
-
                     this.activeFilters[filterKey] = !this.activeFilters[filterKey];
                     item.classList.toggle('disabled');
-                    this.updateMap(); // Redraw map with new filters
+                    this.updateMap(); 
                 }
             });
         }
