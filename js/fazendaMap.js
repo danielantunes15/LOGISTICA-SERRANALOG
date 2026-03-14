@@ -37,7 +37,7 @@ export function initFazendaMap(containerId) {
         });
 
         L.marker(FABRICA_COORDS, { icon: fabricaIcon }).addTo(map)
-            .bindPopup('<b>Fábrica LOGISTICA BEL</b><br>Localização principal');
+            .bindPopup('<b>Fábrica SUZANO</b><br>Localização principal');
 
         return map;
     } catch (error) {
