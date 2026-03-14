@@ -5,12 +5,12 @@ import { dataCache } from '../dataCache.js'; // NOVO: Importar dataCache
 // Coloque sua chave real do OpenWeather aqui:
 const API_KEY = 'fdcb3d82c679c196a11975457733c8d6';
 
-// MUDANÇA: Lista fixa de locais agora é um fallback e ponto de partida
+// MUDANÇA: Lista fixa de locais atualizada com as novas coordenadas
 const FIXED_LOCATIONS = [
-    { name: 'Usina Bahia Etanol', type: 'city', lat: -17.6423, lon: -40.1815 },
+    { name: 'Suzano', type: 'city', lat: -18.00055965461479, lon: -39.8648042772289 },
     { name: 'Lajedão-BA', type: 'city', lat: -17.6138, lon: -40.345 },
     { name: 'Nanuque-MG', type: 'city', lat: -17.8389, lon: -40.3539 },
-    { name: 'S. Aimorés-MG', type: 'city', lat: -17.7828, lon: -40.2477 } // Serra dos Aimorés
+    { name: 'Teixeira de Freitas-BA', type: 'city', lat: -17.538013412733516, lon: -39.74407229271114 } 
 ];
 
 // Helper para converter UNIX timestamp para BRT HH:MM
