@@ -268,7 +268,9 @@ export class DashboardView {
 
         const operationalStatuses = CAMINHAO_ROUTE_STATUS;
         const readyStatuses = ['disponivel', 'patio_vazio'];
-        const criticalStatuses = ['quebrado', 'parado'];
+        
+        // NOVO: Adicionado 'pendente_checklist' para ser contabilizado como crítico no painel
+        const criticalStatuses = ['quebrado', 'parado', 'pendente_checklist'];
 
         const totalCaminhoes = caminhoes ? caminhoes.length : 0;
         const caminhoesEmOperacao = caminhoes ? caminhoes.filter(c => operationalStatuses.includes(c.status)).length : 0;
