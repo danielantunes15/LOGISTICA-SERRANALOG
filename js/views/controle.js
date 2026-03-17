@@ -198,7 +198,8 @@ export class ControleView {
             carregando: 0,
             retornando: 0,
             descarregando: 0,
-            inativos: 0 
+            em_manutencao: 0, 
+            pendente_checklist: 0
         };
         
         if (!this.data.caminhoes) return counts;
@@ -219,7 +220,10 @@ export class ControleView {
                     break;
                 case 'quebrado':
                 case 'parado':
-                    counts.inativos++;
+                    counts.em_manutencao++;
+                    break;
+                case 'pendente_checklist':
+                    counts.pendente_checklist++;
                     break;
             }
         }
@@ -230,7 +234,12 @@ export class ControleView {
         const counts = this._calculateDashboardCounts();
         
         const createCard = (statusKey, count, label) => {
-            const cardClass = (statusKey === 'inativos') ? 'summary-quebrado' : `summary-${statusKey}`;
+            let cardClass = `summary-${statusKey}`;
+            if (statusKey === 'em_manutencao') {
+                cardClass = 'summary-quebrado';
+            } else if (statusKey === 'pendente_checklist') {
+                cardClass = 'summary-warning'; 
+            }
             
             return `
                 <div class="summary-card ${cardClass} clickable-dashboard-card" data-status-key="${statusKey}">
@@ -246,7 +255,8 @@ export class ControleView {
                 ${createCard('carregando', counts.carregando, this.statusLabels['carregando'])}
                 ${createCard('retornando', counts.retornando, this.statusLabels['retornando'])}
                 ${createCard('descarregando', counts.descarregando, this.statusLabels['descarregando'])}
-                ${createCard('inativos', counts.inativos, 'Quebrados / Parados')}
+                ${createCard('em_manutencao', counts.em_manutencao, 'Em Manutenção')}
+                ${createCard('pendente_checklist', counts.pendente_checklist, 'Aguard. Vistoria')}
             </div>
         `;
     }
@@ -291,7 +301,8 @@ export class ControleView {
             'descarregando',
             'patio_vazio',
             'parado',
-            'quebrado'
+            'quebrado',
+            'pendente_checklist'
         ];
         
         const legendItems = relevantStatuses.map(status => {
@@ -566,9 +577,11 @@ export class ControleView {
         let statusList = [statusKey];
         let modalTitle = this.statusLabels[statusKey];
 
-        if (statusKey === 'inativos') {
+        if (statusKey === 'em_manutencao') {
             statusList = ['parado', 'quebrado'];
-            modalTitle = 'Quebrados / Parados';
+            modalTitle = 'Em Manutenção';
+        } else if (statusKey === 'pendente_checklist') {
+            modalTitle = 'Aguardando Vistoria';
         }
 
         const filteredTrucks = this.data.caminhoes.filter(c => statusList.includes(c.status));
@@ -594,7 +607,7 @@ export class ControleView {
             rowsHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum caminhão neste status no momento.</td></tr>';
         } else {
             rowsHTML = truckDetails.map(truck => {
-                const statusClass = statusKey === 'inativos' ? truck.status : statusKey;
+                const statusClass = statusKey === 'em_manutencao' ? truck.status : statusKey;
                 
                 return `
                     <tr>
@@ -1087,7 +1100,7 @@ export class ControleView {
         }
 
 
-        const statusOptions = [...this.statusCiclo, 'quebrado', 'disponivel', 'parado']; 
+        const statusOptions = [...this.statusCiclo, 'quebrado', 'disponivel', 'parado', 'pendente_checklist']; 
 
         const modalContent = `
             <p>Alterando status de: <strong>${caminhao.cod_equipamento}</strong></p>
