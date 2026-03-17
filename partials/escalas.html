@@ -1,35 +1,90 @@
 <div id="escalas-view" class="view" style="display: none;">
-    <div class="controle-header">
-        <h1>Gestão de Escalas</h1>
-        <div class="controle-actions">
-            <button class="btn-primary" id="btn-nova-escala">
-                <i class="ph-fill ph-plus"></i>
-                Nova Escala
-            </button>
+    <div class="escala-header-modern">
+        <div>
+            <h1><i class="ph-fill ph-calendar"></i> Gestão de Escala (12x36 / 12 Horas)</h1>
+            <p>Configure e gere automaticamente as escalas de trabalho para motoristas e equipamentos.</p>
+        </div>
+        <div class="escala-header-actions">
             <button class="btn-secondary" id="refresh-escalas">
-                <i class="ph-fill ph-arrows-clockwise"></i>
-                Atualizar
+                <i class="ph-fill ph-arrows-clockwise"></i> Atualizar Dados
             </button>
         </div>
     </div>
 
-    <div class="controle-grid">
-        <div class="controle-card" style="grid-column: 1 / -1;">
-            <h3>Escalas Programadas</h3>
-            <div class="list-container">
-                <table class="data-table">
+    <div class="escala-main-grid">
+        <div class="escala-config-panel">
+            <div class="panel-title">
+                <h3><i class="ph-fill ph-magic-wand"></i> Gerador Automático</h3>
+            </div>
+            
+            <form id="form-gerar-escala" class="form-modern">
+                <div class="form-group">
+                    <label>Data da Escala</label>
+                    <input type="date" id="escala-data" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Hora de Início (Turno 1)</label>
+                    <input type="time" id="escala-hora" class="form-input" value="07:00" required>
+                    <span class="form-help">O Turno 2 iniciará automaticamente 12h depois.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tipo de Escala</label>
+                    <select class="form-select" disabled>
+                        <option>Revezamento 12 Horas</option>
+                    </select>
+                </div>
+                
+                <button type="button" id="btn-gerar-auto" class="btn-primary w-100 mt-3" style="margin-top: 15px; padding: 12px; font-size: 1rem;">
+                    <i class="ph-fill ph-lightning"></i> Gerar Escala
+                </button>
+            </form>
+
+            <div class="escala-stats mt-4">
+                <h4><i class="ph-fill ph-users"></i> Recursos Disponíveis</h4>
+                <div class="stat-item">
+                    <span>Motoristas Ativos (Frota):</span>
+                    <strong id="count-motoristas">0</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Caminhões na Frota:</span>
+                    <strong id="count-caminhoes">0</strong>
+                </div>
+                <div class="motoristas-list-preview" id="motoristas-preview-list">
+                    </div>
+            </div>
+        </div>
+
+        <div class="escala-view-panel">
+            <div class="panel-header-flex">
+                <h3>Pré-visualização da Escala</h3>
+                <div class="escala-actions">
+                    <button class="btn-secondary" id="btn-limpar-escala" style="display: none;"><i class="ph-fill ph-trash"></i> Limpar</button>
+                    <button class="btn-primary" id="btn-salvar-escala" style="background: var(--accent-primary); display: none;"><i class="ph-fill ph-floppy-disk"></i> Salvar Escala</button>
+                </div>
+            </div>
+            
+            <div class="table-wrapper" style="max-height: 600px; overflow-y: auto;">
+                <table class="data-table-modern escala-table">
                     <thead>
                         <tr>
                             <th>Data</th>
-                            <th>Motorista/Operador</th>
-                            <th>Veículo/Equipamento</th>
-                            <th>Frente/Turno</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th>Turno / Horário</th>
+                            <th>Motorista Designado</th>
+                            <th>Caminhão Associado</th>
+                            <th>Status da Escala</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-escalas-body">
-                        </tbody>
+                        <tr>
+                            <td colspan="5" class="empty-state-escala">
+                                <i class="ph-fill ph-calendar-blank" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 10px;"></i>
+                                <p>Nenhuma escala gerada no momento.</p>
+                                <span>Configure as opções ao lado e clique em "Gerar Escala" para visualizar o rascunho.</span>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
