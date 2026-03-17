@@ -1,6 +1,7 @@
 // js/views/escalas.js
 import { dataCache } from '../dataCache.js';
 import { showToast, showLoading, hideLoading } from '../helpers.js';
+import { insertItem } from '../api.js';
 
 export class EscalasView {
     constructor() {
@@ -156,7 +157,7 @@ export class EscalasView {
             const dataFormatada = `${dia}/${mes}/${ano}`;
 
             // Divisão dos motoristas ativos pela metade
-            const shuffledDrivers = [...this.motoristas].sort(() => 0.5 - Math.random()); // Opcional: embaralhar
+            const shuffledDrivers = [...this.motoristas].sort(() => 0.5 - Math.random());
             const half = Math.ceil(shuffledDrivers.length / 2);
             const turno1Drivers = shuffledDrivers.slice(0, half);
             const turno2Drivers = shuffledDrivers.slice(half);
@@ -229,7 +230,7 @@ export class EscalasView {
             hideLoading();
             showToast('Escala gerada automaticamente! Revise e clique em Salvar.', 'success');
 
-        }, 500); // Simulando um tempo de processamento para melhor UX
+        }, 500); 
     }
 
     clearScale() {
@@ -252,11 +253,11 @@ export class EscalasView {
 
         showLoading();
         try {
-            // OBS: Aqui você implementaria a chamada real da API para salvar a escala no banco.
-            // Exemplo: await insertItem('escalas', this.escalaGerada);
-            
-            // Simulação de salvamento
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Salva linha por linha no banco de dados (tabela: escalas)
+            for (const escala of this.escalaGerada) {
+                const { error } = await insertItem('escalas', escala);
+                if (error) throw error;
+            }
 
             // Muda o visual das tags de Rascunho para Salvo
             const statusBadges = document.querySelectorAll('#tabela-escalas-body .motorista-badge');
@@ -272,7 +273,7 @@ export class EscalasView {
 
             showToast('Escala oficializada com sucesso no banco de dados!', 'success');
         } catch (error) {
-            console.error(error);
+            console.error('Erro ao salvar escala:', error);
             showToast('Erro ao salvar a escala no banco de dados.', 'error');
         } finally {
             hideLoading();
