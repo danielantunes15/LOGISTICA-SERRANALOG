@@ -3,219 +3,192 @@
 .escala-view {
     display: flex;
     flex-direction: column;
-    gap: 32px;
 }
 
-.escala-actions {
+.escala-header-modern {
     display: flex;
-    gap: 12px;
-    padding-bottom: 24px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Dashboard do Turno Atual */
-.turno-atual-dashboard {
-    margin-bottom: 16px;
+.escala-header-modern h1 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin: 0 0 5px 0;
 }
 
-.turno-header {
+.escala-header-modern p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* --- GRID PRINCIPAL --- */
+.escala-main-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* --- PAINEL DE CONFIGURAÇÃO --- */
+.escala-config-panel {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    position: sticky;
+    top: 20px;
+}
+
+.escala-config-panel .panel-title h3 {
+    font-size: 1.2rem;
+    color: var(--accent-edit);
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.escala-stats {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.escala-stats h4 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-dark);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.stat-item strong {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.motoristas-list-preview {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--bg-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+}
+
+.motorista-badge {
+    display: inline-block;
+    background-color: rgba(56, 161, 105, 0.1);
+    color: #38A169;
+    border: 1px solid rgba(56, 161, 105, 0.3);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin: 3px;
+    font-weight: 500;
+}
+
+/* --- PAINEL DA TABELA --- */
+.escala-view-panel {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.panel-header-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.turno-info h3 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-}
-
-.turno-info .turno-badge {
-    font-size: 1.2rem;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 8px;
-    color: white;
-}
-
-.turno-badge.turno-a { background-color: #38A169; }
-.turno-badge.turno-b { background-color: #2B6CB0; }
-.turno-badge.turno-c { background-color: #805AD5; }
-
-.turno-info p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-top: 4px;
-}
-
-.turno-funcionarios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.funcao-card {
-    background-color: var(--bg-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.funcao-card h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--accent-edit);
-    margin-bottom: 16px;
-    padding-bottom: 8px;
     border-bottom: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding-bottom: 12px;
 }
 
-.funcao-card .funcionarios-list {
+.panel-header-flex h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.escala-actions {
     display: flex;
-    flex-direction: column;
     gap: 10px;
 }
 
-.funcao-card .funcionario-item {
-    background-color: var(--bg-light);
-    padding: 10px;
-    border-radius: 6px;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.funcao-card .funcionario-item i {
-    color: var(--accent-primary);
-}
-
-.funcao-card .empty-state-funcao {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 20px 0;
-}
-
-
-/* Calendário de Escala */
-.escala-calendario-container h3 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-}
-
-.escala-table-wrapper {
-    overflow-x: auto;
-}
-
+/* --- TABELA DE ESCALA --- */
 .escala-table {
     width: 100%;
-    min-width: 1000px;
-    border-collapse: collapse;
 }
 
-.escala-table th, .escala-table td {
-    border: 1px solid var(--border-color);
-    padding: 8px;
-    text-align: center;
+.escala-table th {
+    background-color: var(--bg-dark);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.escala-table td {
     vertical-align: middle;
 }
 
-.escala-table thead th {
-    background-color: #374151;
-    padding: 12px 8px;
+.turno-badge {
     font-size: 0.8rem;
-    text-transform: uppercase;
-}
-
-.escala-table thead .header-date {
-    font-weight: 400;
-    display: block;
-    font-size: 0.75rem;
-}
-
-.escala-table th.funcionario-header {
-    text-align: left;
-    width: 250px;
-}
-
-.escala-table tbody tr:hover {
-    background-color: rgba(74, 85, 104, 0.2);
-}
-
-.escala-table .funcionario-info {
-    text-align: left;
-    padding: 12px;
-}
-
-.escala-table .funcionario-nome {
     font-weight: 600;
-    color: var(--text-primary);
-    display: block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
 }
 
-.escala-table .funcionario-funcao {
-    font-size: 0.8rem;
+.turno-dia {
+    background: linear-gradient(135deg, #D69E2E, #B7791F);
+}
+
+.turno-noite {
+    background: linear-gradient(135deg, #2B6CB0, #4C77A5);
+}
+
+.empty-state-escala {
+    text-align: center;
+    padding: 60px 20px !important;
     color: var(--text-secondary);
 }
 
-.escala-table .turno-select {
-    width: 100%;
-    min-width: 60px;
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 6px;
-    cursor: pointer;
-    font-family: var(--font-family);
+.empty-state-escala span {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9rem;
 }
 
-/* Cores para o select baseado no turno */
-.turno-select.turno-A { background-color: #38A169; color: white; }
-.turno-select.turno-B { background-color: #2B6CB0; color: white; }
-.turno-select.turno-C { background-color: #805AD5; color: white; }
-
-/* Estilização das Células da Escala */
-.escala-table td.td-turno {
-    transition: all 0.3s ease;
-    padding: 8px !important;
-}
-
-/* DIAS DE TRABALHO: Cores de fundo suaves e profissionais */
-.td-turno.turno-Dia, .td-turno.turno-A { 
-    background-color: #fff9db !important; /* Amarelo muito claro */
-}
-
-.td-turno.turno-Noite, .td-turno.turno-C { 
-    background-color: #e7f5ff !important; /* Azul muito claro */
-}
-
-.td-turno.turno-B, .td-turno.turno-ADM { 
-    background-color: #f3f0ff !important; /* Roxo muito claro */
-}
-
-/* DIA DE FOLGA: Destaque para facilitar a leitura rápida */
-.td-turno.turno-Folga {
-    background-color: #fff5f5 !important; /* Vermelho/Rosa clarinho para a célula */
-}
-
-/* Estilo do Select dentro da célula colorida */
-.turno-select {
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 4px;
-    padding: 4px;
-    width: 100%;
-    font-weight: 500;
-}
-
-/* Destaque visual na borda para a Folga */
-.turno-select.turno-Folga {
-    border-color: #ffc9c9;
-    color: #fa5252;
-    background-color: white;
+@media (max-width: 1024px) {
+    .escala-main-grid {
+        grid-template-columns: 1fr;
+    }
+    .escala-config-panel {
+        position: static;
+    }
 }
