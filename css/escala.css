@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
 }
@@ -22,19 +22,291 @@
 
 .escala-header-modern p {
     color: var(--text-secondary);
-    font-size: 0.9rem;
     margin: 0;
 }
 
-/* --- GRID PRINCIPAL --- */
+/* --- ABAS (TABS) --- */
+.escala-tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    overflow-x: auto;
+}
+
+.escala-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.escala-tab:hover {
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+}
+
+.escala-tab.active {
+    background-color: rgba(56, 161, 105, 0.1);
+    color: var(--accent-primary);
+    border: 1px solid rgba(56, 161, 105, 0.3);
+}
+
+/* IMPORTANTE: Aqui é o que corrige o bug de não aparecer o gerador */
+.escala-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.escala-tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ABA 1: AGENDA GERAL --- */
+.agenda-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 24px;
+    background-color: var(--bg-light);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.agenda-date-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.agenda-date-display input[type="date"] {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.agenda-col {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.agenda-col-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.agenda-col-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.agenda-col-count {
+    background-color: rgba(0,0,0,0.3);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.turno-dia-header { background: linear-gradient(135deg, #D69E2E, #B7791F); }
+.turno-noite-header { background: linear-gradient(135deg, #2B6CB0, #4C77A5); }
+.turno-apoio-header { background: linear-gradient(135deg, #805AD5, #6B46C1); }
+
+.agenda-list {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 200px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.agenda-card {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--accent-primary);
+    position: relative;
+}
+
+.agenda-card-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.agenda-card-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.agenda-card-truck {
+    background-color: rgba(255,255,255,0.05);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-delete-escala {
+    background: none;
+    border: none;
+    color: var(--accent-danger);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+    transition: transform 0.2s;
+}
+
+.btn-delete-escala:hover {
+    transform: scale(1.2);
+}
+
+.empty-state-agenda {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- ABA 2: VISÃO 7 DIAS (SEMANAL) --- */
+.semana-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.semana-card {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.semana-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+.semana-card-header .date-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.semana-card-header .badge-count {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.semana-turnos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.semana-turno-col {
+    background-color: var(--bg-dark);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    min-height: 100px;
+}
+
+.semana-turno-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 5px;
+}
+
+.semana-driver-item {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* --- ABA 3: GERADOR AUTOMÁTICO --- */
 .escala-main-grid {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 24px;
     align-items: start;
 }
 
-/* --- PAINEL DE CONFIGURAÇÃO --- */
 .escala-config-panel {
     background-color: var(--bg-light);
     border: 1px solid var(--border-color);
@@ -65,9 +337,6 @@
     font-size: 1rem;
     color: var(--text-primary);
     margin: 0 0 15px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .stat-item {
@@ -88,29 +357,6 @@
     font-size: 1.1rem;
 }
 
-.motoristas-list-preview {
-    margin-top: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: var(--bg-dark);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    padding: 10px;
-}
-
-.motorista-badge {
-    display: inline-block;
-    background-color: rgba(56, 161, 105, 0.1);
-    color: #38A169;
-    border: 1px solid rgba(56, 161, 105, 0.3);
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    margin: 3px;
-    font-weight: 500;
-}
-
-/* --- PAINEL DA TABELA --- */
 .escala-view-panel {
     background-color: var(--bg-light);
     border: 1px solid var(--border-color);
@@ -138,7 +384,6 @@
     gap: 10px;
 }
 
-/* --- TABELA DE ESCALA --- */
 .escala-table {
     width: 100%;
 }
@@ -147,41 +392,50 @@
     background-color: var(--bg-dark);
     color: var(--text-secondary);
     font-size: 0.85rem;
+    padding: 10px;
 }
 
 .escala-table td {
     vertical-align: middle;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.turno-badge {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 6px 12px;
+/* Estilo para os selects dentro da tabela */
+.select-tabela {
+    width: 100%;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 8px;
     border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: white;
+    font-size: 0.85rem;
+    outline: none;
 }
 
-.turno-dia {
-    background: linear-gradient(135deg, #D69E2E, #B7791F);
+.select-tabela:focus {
+    border-color: var(--accent-primary);
 }
 
-.turno-noite {
-    background: linear-gradient(135deg, #2B6CB0, #4C77A5);
+.btn-remover-linha {
+    background: none;
+    border: none;
+    color: var(--accent-danger);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.btn-remover-linha:hover {
+    background-color: rgba(229, 62, 62, 0.1);
 }
 
 .empty-state-escala {
     text-align: center;
     padding: 60px 20px !important;
     color: var(--text-secondary);
-}
-
-.empty-state-escala span {
-    display: block;
-    margin-top: 5px;
-    font-size: 0.9rem;
 }
 
 @media (max-width: 1024px) {
