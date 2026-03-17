@@ -77,45 +77,203 @@ export class GestaoFrotaView {
     }
 
     // ==========================================
-    // 1. DASHBOARD DA FROTA
+    // 1. DASHBOARD DA FROTA (MODERNIZADO)
     // ==========================================
     getDashboardHTML() {
+        // 1. Processamento de Dados (Caminhões e Motoristas)
         const totalCaminhoes = this.caminhoes.length;
         const totalMotoristas = this.motoristas.length;
-        const totalPneus = this.pneus.length;
+        
+        const caminhoesOperacao = this.caminhoes.filter(c => ['indo_carregar', 'carregando', 'retornando', 'descarregando'].includes(c?.status)).length;
+        const caminhoesParados = this.caminhoes.filter(c => ['quebrado', 'parado', 'pendente_checklist'].includes(c?.status)).length;
+        const caminhoesDisponiveis = this.caminhoes.filter(c => ['disponivel', 'patio_vazio'].includes(c?.status)).length;
+
+        // Porcentagens para a barra visual
+        const pctOperacao = totalCaminhoes > 0 ? (caminhoesOperacao / totalCaminhoes) * 100 : 0;
+        const pctParados = totalCaminhoes > 0 ? (caminhoesParados / totalCaminhoes) * 100 : 0;
+        const pctDisponivel = totalCaminhoes > 0 ? (caminhoesDisponiveis / totalCaminhoes) * 100 : 0;
+
+        // 2. Processamento de Manutenção
         const osAbertas = this.manutencoes.filter(m => m.status_os !== 'Concluída').length;
+        const osConcluidas = this.manutencoes.filter(m => m.status_os === 'Concluída').length;
+        const custoTotalManutencao = this.manutencoes.reduce((acc, m) => acc + parseFloat(m.custo_pecas || 0) + parseFloat(m.custo_mao_obra || 0), 0);
+
+        // 3. Processamento de Abastecimento
+        let totalMediaKml = 0;
+        let countMedia = 0;
+        let custoTotalAbastecimento = 0;
+        this.abastecimentos.forEach(ab => {
+            if (ab.media_kml) { totalMediaKml += parseFloat(ab.media_kml); countMedia++; }
+            if (ab.valor_total) { custoTotalAbastecimento += parseFloat(ab.valor_total); }
+        });
+        const mediaGeralKml = countMedia > 0 ? (totalMediaKml / countMedia).toFixed(2) : '0.00';
+
+        // 4. Processamento de Pneus
+        const totalPneus = this.pneus.length;
+        const pneusEmUso = this.pneus.filter(p => p.status === 'Em Uso').length;
+        const pneusEstoque = this.pneus.filter(p => p.status === 'Estoque').length;
+        const pneusManutencao = this.pneus.filter(p => p.status === 'Manutenção').length;
+
+        // 5. Processamento de Telemetria
+        let sumFreadas = 0;
+        let sumRpm = 0;
+        let sumOcioso = 0;
+        this.telemetrias.forEach(t => {
+            sumFreadas += parseInt(t.eventos_freada_brusca || 0);
+            sumRpm += parseInt(t.eventos_excesso_rpm || 0);
+            sumOcioso += parseInt(t.tempo_ocioso_minutos || 0);
+        });
+        const mediaTelemetria = this.telemetrias.length > 0
+            ? (this.telemetrias.reduce((acc, t) => acc + parseFloat(t.nota_conducao || 0), 0) / this.telemetrias.length).toFixed(1)
+            : 'N/A';
+
+        // Helper Monetário
+        const formatMoney = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
         return `
-            <div id="gestao-frota-view-dashboard" class="view active-view">
-                <div class="cadastro-container">
-                    <div class="cadastro-header">
-                        <h1><i class="ph-fill ph-chart-pie-slice"></i> Dashboard da Frota Própria</h1>
-                        <p>Visão geral dos indicadores de performance e disponibilidade.</p>
-                    </div>
-                    <div class="cadastro-content">
-                        <div class="dashboard-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                            <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--primary-color);">
-                                <h3 style="color: var(--text-secondary); font-size: 0.9rem;">Total de Tritrens</h3>
-                                <p style="font-size: 2rem; font-weight: bold; color: var(--text-primary); margin: 10px 0;">${totalCaminhoes}</p>
-                            </div>
-                            <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid #38A169;">
-                                <h3 style="color: var(--text-secondary); font-size: 0.9rem;">Motoristas Ativos</h3>
-                                <p style="font-size: 2rem; font-weight: bold; color: var(--text-primary); margin: 10px 0;">${totalMotoristas}</p>
-                            </div>
-                            <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid #3182CE;">
-                                <h3 style="color: var(--text-secondary); font-size: 0.9rem;">Pneus Cadastrados</h3>
-                                <p style="font-size: 2rem; font-weight: bold; color: var(--text-primary); margin: 10px 0;">${totalPneus}</p>
-                            </div>
-                            <div class="stat-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid var(--accent-danger);">
-                                <h3 style="color: var(--text-secondary); font-size: 0.9rem;">OS em Andamento</h3>
-                                <p style="font-size: 2rem; font-weight: bold; color: var(--text-primary); margin: 10px 0;">${osAbertas}</p>
-                            </div>
+            <div id="gestao-frota-view-dashboard" class="view active-view frota-dashboard-wrapper">
+                <div class="cadastro-header" style="margin-bottom: 24px; border: none; padding: 0;">
+                    <h1><i class="ph-fill ph-chart-line-up"></i> Painel Gerencial de Frota</h1>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">Visão 360º de disponibilidade, manutenções, consumo e telemetria.</p>
+                </div>
+
+                <div class="frota-kpi-grid">
+                    <div class="frota-kpi-card">
+                        <div class="frota-kpi-icon" style="background: linear-gradient(135deg, #3182CE, #2B6CB0);">
+                            <i class="ph-fill ph-truck"></i>
                         </div>
-                        <div class="list-container-modern">
-                            <h2>Atalhos Rápidos</h2>
-                            <p style="color: var(--text-secondary); margin-bottom: 15px;">Utilize o menu lateral para navegar entre os módulos de Abastecimento, Manutenção e Telemetria.</p>
+                        <div class="frota-kpi-details">
+                            <h3>Total de Caminhões</h3>
+                            <p>${totalCaminhoes}</p>
                         </div>
                     </div>
+                    
+                    <div class="frota-kpi-card">
+                        <div class="frota-kpi-icon" style="background: linear-gradient(135deg, #38A169, #2F855A);">
+                            <i class="ph-fill ph-steering-wheel"></i>
+                        </div>
+                        <div class="frota-kpi-details">
+                            <h3>Motoristas Cadastrados</h3>
+                            <p>${totalMotoristas}</p>
+                        </div>
+                    </div>
+
+                    <div class="frota-kpi-card">
+                        <div class="frota-kpi-icon" style="background: linear-gradient(135deg, #E53E3E, #C53030);">
+                            <i class="ph-fill ph-wrench"></i>
+                        </div>
+                        <div class="frota-kpi-details">
+                            <h3>O.S. em Andamento</h3>
+                            <p>${osAbertas}</p>
+                        </div>
+                    </div>
+
+                    <div class="frota-kpi-card">
+                        <div class="frota-kpi-icon" style="background: linear-gradient(135deg, #D69E2E, #B7791F);">
+                            <i class="ph-fill ph-gas-pump"></i>
+                        </div>
+                        <div class="frota-kpi-details">
+                            <h3>Média Geral (Km/L)</h3>
+                            <p>${mediaGeralKml}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="frota-panels-grid">
+                    
+                    <div class="frota-panel">
+                        <div class="frota-panel-header">
+                            <i class="ph-fill ph-activity"></i> Status Atual da Frota
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Em Operação (Colheita/Usina)</span>
+                            <span class="frota-stat-value highlight-green">${caminhoesOperacao}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Disponíveis / Pátio</span>
+                            <span class="frota-stat-value highlight-blue">${caminhoesDisponiveis}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Em Manutenção / Parados</span>
+                            <span class="frota-stat-value highlight-red">${caminhoesParados}</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Distribuição de Disponibilidade</span>
+                            <div class="progress-bar-container">
+                                <div style="width: ${pctOperacao}%; background-color: #38A169;" title="Operação: ${pctOperacao.toFixed(1)}%"></div>
+                                <div style="width: ${pctDisponivel}%; background-color: #3182CE;" title="Disponível: ${pctDisponivel.toFixed(1)}%"></div>
+                                <div style="width: ${pctParados}%; background-color: var(--accent-danger);" title="Parado: ${pctParados.toFixed(1)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="frota-panel">
+                        <div class="frota-panel-header">
+                            <i class="ph-fill ph-wallet"></i> Manutenção & Custos
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">O.S. Concluídas (Histórico)</span>
+                            <span class="frota-stat-value">${osConcluidas}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">O.S. Pendentes / Abertas</span>
+                            <span class="frota-stat-value highlight-red">${osAbertas}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Custo Total em Manutenções</span>
+                            <span class="frota-stat-value highlight-yellow">${formatMoney(custoTotalManutencao)}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Custo Total de Combustível (Reg.)</span>
+                            <span class="frota-stat-value">${formatMoney(custoTotalAbastecimento)}</span>
+                        </div>
+                    </div>
+
+                    <div class="frota-panel">
+                        <div class="frota-panel-header">
+                            <i class="ph-fill ph-broadcast"></i> Telemetria & Condução
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Nota Média dos Motoristas</span>
+                            <span class="frota-stat-value ${mediaTelemetria >= 80 ? 'highlight-green' : 'highlight-red'}">${mediaTelemetria}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Total de Freadas Bruscas</span>
+                            <span class="frota-stat-value highlight-yellow">${sumFreadas}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Eventos de Excesso de RPM</span>
+                            <span class="frota-stat-value highlight-red">${sumRpm}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Tempo Ocioso Acumulado</span>
+                            <span class="frota-stat-value">${sumOcioso} min</span>
+                        </div>
+                    </div>
+
+                    <div class="frota-panel">
+                        <div class="frota-panel-header">
+                            <i class="ph-fill ph-circles-four"></i> Inventário de Pneus
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Total Cadastrados no Sistema</span>
+                            <span class="frota-stat-value">${totalPneus}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Pneus em Uso (Instalados)</span>
+                            <span class="frota-stat-value highlight-blue">${pneusEmUso}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Pneus Novos/Bons no Estoque</span>
+                            <span class="frota-stat-value highlight-green">${pneusEstoque}</span>
+                        </div>
+                        <div class="frota-stat-row">
+                            <span class="frota-stat-label">Enviados para Recapagem/Manut.</span>
+                            <span class="frota-stat-value highlight-yellow">${pneusManutencao}</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         `;
