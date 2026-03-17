@@ -9,7 +9,8 @@ export const CAMINHAO_STATUS_LABELS = {
     descarregando: 'Descarregando',
     patio_vazio: 'Pátio Vazio',
     quebrado: 'Quebrado',
-    parado: 'Parado (Obs.)' // Status de parada com observação
+    parado: 'Parado (Obs.)', // Status de parada com observação
+    pendente_checklist: 'Aguard. Vistoria' // NOVO STATUS
 };
 
 export const CAMINHAO_STATUS_CYCLE = [
