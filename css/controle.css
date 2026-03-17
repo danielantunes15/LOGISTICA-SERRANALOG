@@ -111,6 +111,7 @@
 .summary-quebrado { border-color: var(--accent-danger); }
 .summary-disponivel { border-color: var(--accent-primary); } 
 .summary-parado { border-color: #ED8936; } 
+.summary-warning { border-color: #D69E2E; } /* NOVO: Aguardando Vistoria */
 
 /* --- CABEÇALHO DO GRUPO --- */
 .frente-group-header {
@@ -296,6 +297,7 @@
 .status-disponivel { background-color: #718096; }
 .status-quebrado { background-color: var(--accent-danger); }
 .status-parado { background-color: #ED8936; } 
+.status-pendente_checklist { background-color: #D69E2E; } /* NOVO: Aguardando Vistoria */
 
 
 .historico-container { background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
@@ -750,6 +752,10 @@
 
 .legend-color-box.status-parado,
 .truck-code-badge.status-parado { background-color: #ED8936; }
+
+/* NOVO: Cor do badge para Aguardando Vistoria */
+.legend-color-box.status-pendente_checklist,
+.truck-code-badge.status-pendente_checklist { background-color: #D69E2E; }
 
 
 /* Destaque Hora Atual */
